@@ -1,0 +1,11 @@
+name: PluginVersion
+description: List of plugins and their versions
+version: 0.1
+author: NateLogan
+main: org.petricek.bukkit.pluginversion.PluginVersion
+website: http://something.eu
+commands:
+  pluginversion:
+    description: List of plugins and their versions
+    usage: /<command> - Displays plugins verions
+    aliases: [plugv]
