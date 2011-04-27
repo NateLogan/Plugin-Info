@@ -1,4 +1,4 @@
-package me.taylorkelly.help;
+package org.petricek.bukkit.pluginversion.util;
 
 import java.util.HashMap;
 import java.util.Map;

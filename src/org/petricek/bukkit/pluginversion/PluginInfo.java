@@ -1,5 +1,7 @@
 package org.petricek.bukkit.pluginversion;
 
+import java.util.ArrayList;
+
 /**
  *
  * @author Michal Petříček
@@ -10,9 +12,15 @@ public class PluginInfo implements Comparable<PluginInfo> {
     }
 
     private String name;
+    private String fullName;
     private String description;
     private String version;
     private String website;
+    private ArrayList<String> authors;
+    private boolean databaseEnabled;
+    private Object commands;
+    private Object depend;
+    private boolean enabled;
 
     public String getDescription() {
         return description;
@@ -30,6 +38,14 @@ public class PluginInfo implements Comparable<PluginInfo> {
         this.name = name;
     }
 
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
     public String getVersion() {
         return version;
     }
@@ -44,6 +60,46 @@ public class PluginInfo implements Comparable<PluginInfo> {
 
     public void setWebsite(String website) {
         this.website = website;
+    }
+
+    public ArrayList<String> getAuthors() {
+        return authors;
+    }
+
+    public void setAuthors(ArrayList<String> authors) {
+        this.authors = authors;
+    }
+
+    public boolean isDatabaseEnabled() {
+        return databaseEnabled;
+    }
+
+    public void setDatabaseEnabled(boolean databaseEnabled) {
+        this.databaseEnabled = databaseEnabled;
+    }
+
+    public Object getCommands() {
+        return commands;
+    }
+
+    public void setCommands(Object commands) {
+        this.commands = commands;
+    }
+
+    public Object getDepend() {
+        return depend;
+    }
+
+    public void setDepend(Object depend) {
+        this.depend = depend;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
     }
 
     public int compareTo(PluginInfo o) {

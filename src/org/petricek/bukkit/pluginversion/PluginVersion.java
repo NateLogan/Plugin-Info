@@ -34,9 +34,17 @@ public class PluginVersion extends JavaPlugin {
         name = this.getDescription().getName();
         version = this.getDescription().getVersion();
 
-        PluginSettings.initialize(this.getDataFolder());
+        loadSettings();
 
         BukkitLogger.info(name + " " + version + " enabled");
+        PluginSaveData.onEnableSave(getVersionsList(), getServerInfo());
+
+        getServerInfo();
+    }
+
+    private void loadSettings(){
+        PluginSettings.initialize(this.getDataFolder());
+        PluginSettingsXml.initialize(this.getDataFolder());
     }
 
     @Override
@@ -51,10 +59,38 @@ public class PluginVersion extends JavaPlugin {
                 if (isInteger(args[0])) {
                     int page = Integer.parseInt(args[0]);
                     messages = getPage(page, console);
-                } else if (args[0].equalsIgnoreCase("all")) {
-                    messages = getAll(console);
+                } else if (args[0].equalsIgnoreCase("list")) {
+                    messages = getPage(1, console);
+                } else if (args[0].equalsIgnoreCase("reload")) {
+                    loadSettings();
+                } else if (args[0].equalsIgnoreCase("export")) {
+                    boolean save = PluginSaveData.save(getVersionsList(), getServerInfo(), true, false);
+                    messages.add(headertColor.toString() + "Export " + (save ? "succesful" : errorColor.toString() + "failed"));
                 } else if (args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("?")) {
                     messages = getHelp(console);
+                }
+            } else if (args.length == 2) {
+                if (args[0].equalsIgnoreCase("list") && isInteger(args[1])) {
+                    int page = Integer.parseInt(args[1]);
+                    messages = getPage(page, console);
+                } else if (args[0].equalsIgnoreCase("list") && args[1].equalsIgnoreCase("all")) {
+                    messages = getAll(console);
+                } else if (args[0].equalsIgnoreCase("export") && args[1].equalsIgnoreCase("list")) {
+                    messages.add(headertColor.toString() + "Available exports: " + nameColor.toString() + "xml html txt");
+                } else if (args[0].equalsIgnoreCase("export") && args[1].equalsIgnoreCase("all")) {
+                    boolean save = PluginSaveData.save(getVersionsList(), getServerInfo(), true, true);
+                    messages.add(headertColor.toString() + "Export " + (save ? "succesful" : errorColor.toString() + "failed"));
+                } else if (args[0].equalsIgnoreCase("export") && !args[1].isEmpty()) {
+                    if (args[1].equalsIgnoreCase("xml")) {
+                        boolean save = PluginSaveData.instance.saveXML(getVersionsList(), getServerInfo(), true);
+                        messages.add(headertColor.toString() + "Export " + (save ? "succesful" : errorColor.toString() + "failed"));
+                    } else if (args[1].equalsIgnoreCase("html")) {
+                        //TODO export
+                    } else if (args[1].equalsIgnoreCase("txt")) {
+                        //TODO export
+                    } else {
+                        messages.add(errorColor.toString() + "Unknown export format.");
+                    }
                 }
             } else {
                 messages = getHelp(console);
@@ -73,8 +109,13 @@ public class PluginVersion extends JavaPlugin {
     private LinkedList<String> getHelp(boolean console) {
         LinkedList<String> list = new LinkedList<String>();
         list.add(headertColor.toString() + "[Plugin Version HELP]");
-        list.add(commandColor.toString() + " /pluginversion all" + textColor.toString() + " - List all plugins");
-        list.add(commandColor.toString() + " /pluginversion #" + textColor.toString() + " - Detailed list of " + PluginSettings.entriesPerPage + " plugins at a time");
+        list.add(commandColor.toString() + " /pluginversion list all" + textColor.toString() + " - List all plugins");
+        list.add(commandColor.toString() + " /pluginversion list [#]" + textColor.toString() + " - Detailed list of " + PluginSettings.entriesPerPage + " plugins at a time");
+        list.add(commandColor.toString() + " /pluginversion export" + textColor.toString() + " - Export plugins info into files defined in config.yml");
+        list.add(commandColor.toString() + " /pluginversion export [param]" + textColor.toString() + " - Export plugins info into [param]-type file.");
+        list.add(commandColor.toString() + " /pluginversion export list" + textColor.toString() + " - List of available export file types.");
+        list.add(commandColor.toString() + " /pluginversion export all" + textColor.toString() + " - Export plugins info into all available files");
+        list.add(commandColor.toString() + " /pluginversion reload" + textColor.toString() + " - Reloads the settings");
         return list;
     }
 
@@ -121,6 +162,12 @@ public class PluginVersion extends JavaPlugin {
             pluginInfo.setDescription(plugin.getDescription().getDescription());
             pluginInfo.setVersion(plugin.getDescription().getVersion());
             pluginInfo.setWebsite(plugin.getDescription().getWebsite());
+            pluginInfo.setAuthors(plugin.getDescription().getAuthors());
+            pluginInfo.setFullName(plugin.getDescription().getFullName());
+            pluginInfo.setDepend(plugin.getDescription().getDepend());
+            pluginInfo.setCommands(plugin.getDescription().getCommands());
+            pluginInfo.setDatabaseEnabled(plugin.getDescription().isDatabaseEnabled());
+            pluginInfo.setEnabled(plugin.isEnabled());
             list.add(pluginInfo);
         }
 
@@ -128,7 +175,15 @@ public class PluginVersion extends JavaPlugin {
 
         return list;
     }
-    
+
+    private ServerInfo getServerInfo() {
+        ServerInfo serverInfo = new ServerInfo();
+        serverInfo.setVersions(this.getServer().getVersion());
+        serverInfo.setServerName(this.getServer().getServerName());
+        serverInfo.setServerPort("" + this.getServer().getPort());
+        return serverInfo;
+    }
+
     private String getLineConsole(PluginInfo pluginInfo, int maxNameLength) {
         StringBuilder out = new StringBuilder(nameColor.toString() + pluginInfo.getName());
         for (int i = out.length(); i < maxNameLength; i++) {
@@ -152,7 +207,7 @@ public class PluginVersion extends JavaPlugin {
     private int getMaxNameLength(ArrayList<PluginInfo> list) {
         int maxLength = 0;
         for (PluginInfo pluginInfo : list) {
-            if(pluginInfo.getName().length() > maxLength) {
+            if (pluginInfo.getName().length() > maxLength) {
                 maxLength = pluginInfo.getName().length();
             }
         }
@@ -163,7 +218,7 @@ public class PluginVersion extends JavaPlugin {
         int maxWidth = 0;
         for (PluginInfo pluginInfo : list) {
             int stringWidth = JMinecraftFontWidthCalculator.getStringWidth(pluginInfo.getName());
-            if(stringWidth > maxWidth) {
+            if (stringWidth > maxWidth) {
                 maxWidth = stringWidth;
             }
         }
