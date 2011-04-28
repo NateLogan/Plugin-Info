@@ -1,4 +1,4 @@
-package org.petricek.bukkit.pluginversion;
+package org.petricek.bukkit.plugininfo;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
  *
  * @author Michal Petříček
  */
-public class ServerInfo {
+public class ServerData {
 
     private static final Pattern BUKKIT_BUILD_PATTERN = Pattern.compile("b[0-9]+jnks");
     private static final Pattern MC_VERSION_PATTERN = Pattern.compile("\\(MC: [0-9\\._]+\\)");

@@ -1,4 +1,4 @@
-package org.petricek.bukkit.pluginversion;
+package org.petricek.bukkit.plugininfo;
 
 import java.util.ArrayList;
 
@@ -6,9 +6,9 @@ import java.util.ArrayList;
  *
  * @author Michal Petříček
  */
-public class PluginInfo implements Comparable<PluginInfo> {
+public class PluginData implements Comparable<PluginData> {
 
-    public PluginInfo() {
+    public PluginData() {
     }
 
     private String name;
@@ -102,7 +102,7 @@ public class PluginInfo implements Comparable<PluginInfo> {
         this.enabled = enabled;
     }
 
-    public int compareTo(PluginInfo o) {
+    public int compareTo(PluginData o) {
         return this.name.compareToIgnoreCase(o.name);
     }
     

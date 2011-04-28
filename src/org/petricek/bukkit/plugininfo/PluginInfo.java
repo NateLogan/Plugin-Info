@@ -1,4 +1,4 @@
-package org.petricek.bukkit.pluginversion;
+package org.petricek.bukkit.plugininfo;
 
 import com.jascotty2.JMinecraftFontWidthCalculator;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import org.bukkit.entity.Player;
  *
  * @author Michal Petříček
  */
-public class PluginVersion extends JavaPlugin {
+public class PluginInfo extends JavaPlugin {
 
     private String name;
     private String version;
@@ -120,11 +120,11 @@ public class PluginVersion extends JavaPlugin {
     }
 
     private LinkedList<String> getAll(boolean console) {
-        ArrayList<PluginInfo> versionList = getVersionsList();
+        ArrayList<PluginData> versionList = getVersionsList();
         LinkedList<String> list = new LinkedList<String>();
         StringBuilder out = new StringBuilder();
 
-        for (PluginInfo pluginInfo : versionList) {
+        for (PluginData pluginInfo : versionList) {
             String t = nameColor.toString() + pluginInfo.getName() + " " + versionColor.toString() + pluginInfo.getVersion() + textColor.toString() + "; ";
             out.append(t);
         }
@@ -134,7 +134,7 @@ public class PluginVersion extends JavaPlugin {
     }
 
     private LinkedList<String> getPage(int page, boolean console) {
-        ArrayList<PluginInfo> versionList = getVersionsList();
+        ArrayList<PluginData> versionList = getVersionsList();
         LinkedList<String> list = new LinkedList<String>();
 
         if (page < 1 || page > versionList.size() / PluginSettings.entriesPerPage + 1) {
@@ -152,12 +152,12 @@ public class PluginVersion extends JavaPlugin {
         return list;
     }
 
-    private ArrayList<PluginInfo> getVersionsList() {
+    private ArrayList<PluginData> getVersionsList() {
         Plugin[] plugins = this.getServer().getPluginManager().getPlugins();
-        ArrayList<PluginInfo> list = new ArrayList<PluginInfo>(plugins.length);
+        ArrayList<PluginData> list = new ArrayList<PluginData>(plugins.length);
 
         for (Plugin plugin : plugins) {
-            PluginInfo pluginInfo = new PluginInfo();
+            PluginData pluginInfo = new PluginData();
             pluginInfo.setName(plugin.getDescription().getName());
             pluginInfo.setDescription(plugin.getDescription().getDescription());
             pluginInfo.setVersion(plugin.getDescription().getVersion());
@@ -176,15 +176,15 @@ public class PluginVersion extends JavaPlugin {
         return list;
     }
 
-    private ServerInfo getServerInfo() {
-        ServerInfo serverInfo = new ServerInfo();
+    private ServerData getServerInfo() {
+        ServerData serverInfo = new ServerData();
         serverInfo.setVersions(this.getServer().getVersion());
         serverInfo.setServerName(this.getServer().getServerName());
         serverInfo.setServerPort("" + this.getServer().getPort());
         return serverInfo;
     }
 
-    private String getLineConsole(PluginInfo pluginInfo, int maxNameLength) {
+    private String getLineConsole(PluginData pluginInfo, int maxNameLength) {
         StringBuilder out = new StringBuilder(nameColor.toString() + pluginInfo.getName());
         for (int i = out.length(); i < maxNameLength; i++) {
             out.append(" ");
@@ -194,7 +194,7 @@ public class PluginVersion extends JavaPlugin {
         return out.toString();
     }
 
-    private String getLineGame(PluginInfo pluginInfo, int maxNameWidth) {
+    private String getLineGame(PluginData pluginInfo, int maxNameWidth) {
         StringBuilder out = new StringBuilder(nameColor.toString() + pluginInfo.getName());
         for (int i = JMinecraftFontWidthCalculator.getStringWidth(pluginInfo.getName()); i < maxNameWidth; i += JMinecraftFontWidthCalculator.getCharWidth(' ')) {
             out.append(' ');
@@ -204,9 +204,9 @@ public class PluginVersion extends JavaPlugin {
         return out.toString();
     }
 
-    private int getMaxNameLength(ArrayList<PluginInfo> list) {
+    private int getMaxNameLength(ArrayList<PluginData> list) {
         int maxLength = 0;
-        for (PluginInfo pluginInfo : list) {
+        for (PluginData pluginInfo : list) {
             if (pluginInfo.getName().length() > maxLength) {
                 maxLength = pluginInfo.getName().length();
             }
@@ -214,9 +214,9 @@ public class PluginVersion extends JavaPlugin {
         return maxLength;
     }
 
-    private int getLongestNameWidth(ArrayList<PluginInfo> list) {
+    private int getLongestNameWidth(ArrayList<PluginData> list) {
         int maxWidth = 0;
-        for (PluginInfo pluginInfo : list) {
+        for (PluginData pluginInfo : list) {
             int stringWidth = JMinecraftFontWidthCalculator.getStringWidth(pluginInfo.getName());
             if (stringWidth > maxWidth) {
                 maxWidth = stringWidth;

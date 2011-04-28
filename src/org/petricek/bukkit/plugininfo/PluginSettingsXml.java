@@ -2,10 +2,10 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.petricek.bukkit.pluginversion;
+package org.petricek.bukkit.plugininfo;
 
 import java.io.File;
-import org.petricek.bukkit.pluginversion.util.BetterConfig;
+import org.petricek.bukkit.plugininfo.util.BetterConfig;
 
 /**
  *

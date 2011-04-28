@@ -1,9 +1,8 @@
-name: PluginVersion
+name: PluginInfo
 description: List of plugins and their versions
-version: 0.1
+version: 0.2
 author: NateLogan
-main: org.petricek.bukkit.pluginversion.PluginVersion
-website: http://something.eu
+main: org.petricek.bukkit.plugininfo.PluginInfo
 commands:
   pluginversion:
     description: List of plugins and their versions

@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package org.petricek.bukkit.pluginversion;
+package org.petricek.bukkit.plugininfo;
 
 import java.util.logging.Level;
 import java.util.logging.Logger;

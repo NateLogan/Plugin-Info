@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.petricek.bukkit.pluginversion;
+package org.petricek.bukkit.plugininfo.util;
 
 import java.io.BufferedReader;
 import java.io.InputStream;

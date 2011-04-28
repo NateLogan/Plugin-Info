@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package org.petricek.bukkit.pluginversion;
+package org.petricek.bukkit.plugininfo;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -21,11 +21,11 @@ public class PluginSaveData {
 
     public static PluginSaveData instance = new PluginSaveData();
 
-    public static boolean onEnableSave(ArrayList<PluginInfo> pluginList, ServerInfo serverInfo) {
+    public static boolean onEnableSave(ArrayList<PluginData> pluginList, ServerData serverInfo) {
         return save(pluginList, serverInfo, false, false);
     }
 
-    public static boolean save(ArrayList<PluginInfo> pluginList, ServerInfo serverInfo, boolean printPluginStates, boolean force) {
+    public static boolean save(ArrayList<PluginData> pluginList, ServerData serverInfo, boolean printPluginStates, boolean force) {
         boolean success = true;
 
         if (PluginSettings.xmlOnEnableSave || force) {
@@ -36,7 +36,7 @@ public class PluginSaveData {
         return success;
     }
 
-    public boolean saveXML(ArrayList<PluginInfo> pluginList, ServerInfo serverInfo, boolean printPluginStates) {
+    public boolean saveXML(ArrayList<PluginData> pluginList, ServerData serverInfo, boolean printPluginStates) {
         File file = PluginSettings.xmlOutputFolder == null || PluginSettings.xmlOutputFolder.isEmpty()
                 ? new File(PluginSettings.outputFolder, PluginSettings.xmlFileName)
                 : new File(PluginSettings.xmlOutputFolder, PluginSettings.xmlFileName);
@@ -100,7 +100,7 @@ public class PluginSaveData {
                     writer.levelIncrease();
                     {
                         int enabledPlugins = 0;
-                        for (PluginInfo pluginInfo : pluginList) {
+                        for (PluginData pluginInfo : pluginList) {
                             if (pluginInfo.isEnabled()) {
                                 enabledPlugins++;
                             }

@@ -1,4 +1,4 @@
-package org.petricek.bukkit.pluginversion.util;
+package org.petricek.bukkit.plugininfo.util;
 
 import java.util.HashMap;
 import java.util.Map;
