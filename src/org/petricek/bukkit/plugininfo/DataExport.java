@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.petricek.bukkit.plugininfo;
 
 import java.io.BufferedWriter;
@@ -17,30 +13,51 @@ import java.util.Map.Entry;
  *
  * @author Michal Petříček
  */
-public class PluginSaveData {
+public class DataExport {
 
-    public static PluginSaveData instance = new PluginSaveData();
+    public static DataExport instance = new DataExport();
 
-    public static boolean onEnableSave(ArrayList<PluginData> pluginList, ServerData serverInfo) {
-        return save(pluginList, serverInfo, false, false);
+    public static boolean onEnableSave(ArrayList<PluginData> pluginList, ServerData serverData) {
+        return save(pluginList, serverData, false, false);
     }
 
-    public static boolean save(ArrayList<PluginData> pluginList, ServerData serverInfo, boolean printPluginStates, boolean force) {
+    public static boolean save(ArrayList<PluginData> pluginList, ServerData serverData, boolean printPluginStates, boolean force) {
         boolean success = true;
 
-        if (PluginSettings.xmlOnEnableSave || force) {
-            if (!instance.saveXML(pluginList, serverInfo, false)) {
+        if (PluginInfo.settings.xmlSaveEnabled || force) {
+            BukkitLogger.info("XML export started...");
+            if (!instance.saveXML(pluginList, serverData, printPluginStates)) {
                 success = false;
+                BukkitLogger.info("XML export failed.");
+            } else {
+                BukkitLogger.info("XML export successfully finished.");
+            }
+        }
+        if (PluginInfo.settings.txtSaveEnabled || force) {
+            BukkitLogger.info("TXT export started...");
+            if (!instance.saveTXT(pluginList, serverData)) {
+                success = false;
+                BukkitLogger.info("TXT export failed.");
+            } else {
+                BukkitLogger.info("TXT export successfully finished.");
             }
         }
         return success;
     }
 
     public boolean saveXML(ArrayList<PluginData> pluginList, ServerData serverInfo, boolean printPluginStates) {
-        File file = PluginSettings.xmlOutputFolder == null || PluginSettings.xmlOutputFolder.isEmpty()
-                ? new File(PluginSettings.outputFolder, PluginSettings.xmlFileName)
-                : new File(PluginSettings.xmlOutputFolder, PluginSettings.xmlFileName);
-        BukkitLogger.info("Saving data into file: " + file.getPath());
+        final SettingsXml settingsXml = PluginInfo.settingsXml;
+        final Settings settings = PluginInfo.settings;
+
+        if(settings.xmlFileName == null || settings.xmlFileName.isEmpty()){
+            settings.xmlFileName = "plugins.xml";
+            settings.save();
+        }
+
+        File file = settings.xmlOutputFolder == null || settings.xmlOutputFolder.isEmpty()
+                ? new File(settings.outputFolder, settings.xmlFileName)
+                : new File(settings.xmlOutputFolder, settings.xmlFileName);
+        BukkitLogger.info("Saving data into file: " + file.getAbsolutePath());
 
         boolean success = true;
         MyWriter writer = null;
@@ -52,7 +69,7 @@ public class PluginSaveData {
             writer.writeLine("<plugin-info>");
             writer.levelIncrease();
             {
-                if (PluginSettingsXml.printGeneratedTime) {
+                if (settingsXml.printGeneratedTime) {
                     writer.writeLine("<generated>");
                     writer.levelIncrease();
                     {
@@ -63,14 +80,16 @@ public class PluginSaveData {
                     writer.writeLine("</generated>");
                 }
 
-                if (PluginSettingsXml.printServerInfo) {
+                if (settingsXml.printServerInfo || settingsXml.printMinecraftServerInfo || settingsXml.printBukkitInfo) {
                     writer.writeLine("<server>");
                     writer.levelIncrease();
                     {
-                        writer.writeLine("<name>" + normalizeXml(serverInfo.getServerName()) + "</name>");
-                        writer.writeLine("<port>" + normalizeXml(serverInfo.getServerPort()) + "</port>");
+                        if (settingsXml.printServerInfo) {
+                            writer.writeLine("<name>" + normalizeXml(serverInfo.getServerName()) + "</name>");
+                            writer.writeLine("<port>" + normalizeXml(serverInfo.getServerPort()) + "</port>");
+                        }
 
-                        if (PluginSettingsXml.printMinecraftServerInfo) {
+                        if (settingsXml.printMinecraftServerInfo) {
                             writer.writeLine("<minecraft-server>");
                             writer.levelIncrease();
                             {
@@ -80,12 +99,12 @@ public class PluginSaveData {
                             writer.writeLine("</minecraft-server>");
                         }
 
-                        if (PluginSettingsXml.printBukkitInfo) {
+                        if (settingsXml.printBukkitInfo) {
                             writer.writeLine("<bukkit>");
                             {
                                 writer.levelIncrease();
-                                writer.writeLine("<version>" + normalizeXml(serverInfo.getBukkitVersion()) + "</version>");
-                                writer.writeLine("<name>" + normalizeXml(serverInfo.getBukkitName()) + "</name>");
+                                writer.writeLine("<build>" + normalizeXml(serverInfo.getBukkitVersion()) + "</build>");
+                                writer.writeLine("<version>" + normalizeXml(serverInfo.getBukkitName()) + "</version>");
                             }
                             writer.levelDecrease();
                             writer.writeLine("</bukkit>");
@@ -95,7 +114,7 @@ public class PluginSaveData {
                     writer.writeLine("</server>");
                 }
 
-                if (PluginSettingsXml.printPlugins) {
+                if (settingsXml.printPlugins) {
                     writer.writeLine("<plugins>");
                     writer.levelIncrease();
                     {
@@ -105,7 +124,7 @@ public class PluginSaveData {
                                 enabledPlugins++;
                             }
 
-                            if (printPluginStates && PluginSettingsXml.printPluginEnabled) {
+                            if (printPluginStates && settingsXml.printPluginEnabled) {
                                 writer.writeLine("<plugin enabled=" + pluginInfo.isEnabled() + ">");
                             } else {
                                 writer.writeLine("<plugin>");
@@ -115,27 +134,27 @@ public class PluginSaveData {
                                 //name:
                                 writer.writeLine("<name>" + normalizeXml(pluginInfo.getName()) + "</name>");
                                 //version:
-                                if (PluginSettingsXml.printVersion && pluginInfo.getVersion() != null && !pluginInfo.getVersion().isEmpty()) {
+                                if (settingsXml.printVersion && pluginInfo.getVersion() != null && !pluginInfo.getVersion().isEmpty()) {
                                     writer.writeLine("<version>" + normalizeXml(pluginInfo.getVersion()) + "</version>");
                                 }
                                 //fullname:
-                                if (PluginSettingsXml.printFullname && pluginInfo.getFullName() != null && !pluginInfo.getFullName().isEmpty()) {
+                                if (settingsXml.printFullname && pluginInfo.getFullName() != null && !pluginInfo.getFullName().isEmpty()) {
                                     writer.writeLine("<fullname>" + normalizeXml(pluginInfo.getFullName()) + "</fullname>");
                                 }
                                 //desc:
-                                if (PluginSettingsXml.printDesc && pluginInfo.getDescription() != null && !pluginInfo.getDescription().isEmpty()) {
+                                if (settingsXml.printDesc && pluginInfo.getDescription() != null && !pluginInfo.getDescription().isEmpty()) {
                                     writer.writeLine("<description>" + normalizeXml(pluginInfo.getDescription()) + "</description>");
                                 }
                                 //web:
-                                if (PluginSettingsXml.printWeb && pluginInfo.getWebsite() != null && !pluginInfo.getWebsite().isEmpty()) {
+                                if (settingsXml.printWeb && pluginInfo.getWebsite() != null && !pluginInfo.getWebsite().isEmpty()) {
                                     writer.writeLine("<website>" + normalizeXml(pluginInfo.getWebsite()) + "</website>");
                                 }
                                 //database-enabled:
-                                if (PluginSettingsXml.printDatabaseEnabled && pluginInfo.isDatabaseEnabled()) {
+                                if (settingsXml.printDatabaseEnabled && pluginInfo.isDatabaseEnabled()) {
                                     writer.writeLine("<database-enabled>" + String.valueOf(pluginInfo.isDatabaseEnabled()) + "</database-enabled>");
                                 }
                                 //author(s):
-                                if (PluginSettingsXml.printAuthors && pluginInfo.getAuthors() != null && !pluginInfo.getAuthors().isEmpty()) {
+                                if (settingsXml.printAuthors && pluginInfo.getAuthors() != null && !pluginInfo.getAuthors().isEmpty()) {
                                     if (pluginInfo.getAuthors().size() == 1) {
                                         writer.writeLine("<author>" + normalizeXml(pluginInfo.getAuthors().get(0)) + "</author>");
                                     } else {
@@ -151,13 +170,13 @@ public class PluginSaveData {
                                     }
                                 }
                                 //commands:
-                                if (PluginSettingsXml.printCommands && pluginInfo.getCommands() != null && pluginInfo.getCommands() instanceof LinkedHashMap && !((LinkedHashMap) pluginInfo.getCommands()).isEmpty()) {
+                                if (settingsXml.printCommands && pluginInfo.getCommands() != null && pluginInfo.getCommands() instanceof LinkedHashMap && !((LinkedHashMap) pluginInfo.getCommands()).isEmpty()) {
                                     writer.writeLine("<commands>");
                                     writer.levelIncrease();
                                     {
                                         LinkedHashMap commands = (LinkedHashMap) pluginInfo.getCommands();
 
-                                        if (PluginSettingsXml.printCommandsDetails) {
+                                        if (settingsXml.printCommandsDetails) {
                                             for (Object objectCommand : commands.entrySet()) {
                                                 Entry entryCommand = (Entry) objectCommand;
                                                 writer.writeLine("<command>");
@@ -204,7 +223,9 @@ public class PluginSaveData {
                                     writer.writeLine("</commands>");
                                 }
                                 //depend:
-                                if (PluginSettingsXml.printDepend && pluginInfo.getDepend() != null && pluginInfo.getDepend() instanceof ArrayList && !((ArrayList) pluginInfo.getDepend()).isEmpty()) {
+                                if (settingsXml.printDepend && pluginInfo.getDepend() != null
+                                        && pluginInfo.getDepend() instanceof ArrayList
+                                        && !((ArrayList) pluginInfo.getDepend()).isEmpty()) {
                                     writer.writeLine("<depend>");
                                     writer.levelIncrease();
                                     {
@@ -244,11 +265,69 @@ public class PluginSaveData {
             writer.writeLine("</plugin-info>");
         } catch (Exception ex) {
             success = false;
-            BukkitLogger.severe("Unable to write data into file", ex);
-            writer.close();
+            BukkitLogger.severe("Unable to write data into file " + file.getAbsolutePath(), ex);
+            if(writer != null) writer.close();
             file.delete();
         } finally {
-            writer.close();
+            if(writer != null) writer.close();
+        }
+
+        return success;
+    }
+
+    public boolean saveTXT(ArrayList<PluginData> pluginList, ServerData serverInfo) {
+        final SettingsTxt settingsTxt = PluginInfo.settingsTxt;
+        final Settings settings = PluginInfo.settings;
+
+        if(settings.txtFileName == null || settings.txtFileName.isEmpty()){
+            settings.txtFileName = "plugins.txt";
+            settings.save();
+        }
+
+        File file = settings.txtOutputFolder == null || settings.txtOutputFolder.isEmpty()
+                ? new File(settings.outputFolder, settings.txtFileName)
+                : new File(settings.txtOutputFolder, settings.txtFileName);
+        BukkitLogger.info("Saving data into file: " + file.getAbsolutePath());
+
+        boolean success = true;
+        MyWriter writer = null;
+
+        try {
+            writer = new MyWriter(file);
+            if (settingsTxt.printComments && settingsTxt.printTimeStamp) {
+                writer.writeLine(settingsTxt.commentsChar + getDateStamp() + " " + getTimeStamp());
+                writer.writeLine();
+            }
+
+            if (settingsTxt.printServerInfo || settingsTxt.printMinecraftServerInfo || settingsTxt.printBukkitInfo) {
+                if (settingsTxt.printComments) writer.writeLine(settingsTxt.commentsChar + "Server info:");
+                if (settingsTxt.printServerInfo) {
+                    writer.writeLine("Server name" + settingsTxt.delimiter + serverInfo.getServerName());
+                    writer.writeLine("Server port" + settingsTxt.delimiter + serverInfo.getServerPort());
+                }
+                if (settingsTxt.printMinecraftServerInfo){
+                    writer.writeLine("Minecraft version" + settingsTxt.delimiter + serverInfo.getMinecraftVersion());
+                }
+                if (settingsTxt.printBukkitInfo){
+                    writer.writeLine("Bukkit build" + settingsTxt.delimiter + serverInfo.getBukkitVersion());
+                    writer.writeLine("Bukkit version" + settingsTxt.delimiter + serverInfo.getBukkitName());
+                }
+                writer.writeLine();
+            }
+
+            if (settingsTxt.printPluginInfo) {
+                if (settingsTxt.printComments) writer.writeLine(settingsTxt.commentsChar + "Plugins info:");
+                for (PluginData pluginData : pluginList) {
+                    writer.writeLine(pluginData.getName() + settingsTxt.delimiter + pluginData.getVersion());
+                }
+            }
+        } catch (Exception ex) {
+            success = false;
+            BukkitLogger.severe("Unable to write data into file " + file.getAbsolutePath(), ex);
+            if(writer != null) writer.close();
+            file.delete();
+        } finally {
+            if(writer != null) writer.close();
         }
 
         return success;
@@ -358,13 +437,6 @@ public class PluginSaveData {
                 lvl += ONE_LEVEL;
             }
             return lvl;
-        }
-    }
-
-    public static void main(String[] args) {
-        String s = "Ahoj\nJak se máš\rDobře\n\rTak tedy\r\nSbohem";
-        for (String string : s.split("[(\r\n)(\n\r)\n\r]")) {
-            System.out.println(string);
         }
     }
 }

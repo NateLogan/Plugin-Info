@@ -1,15 +1,12 @@
 package org.petricek.bukkit.plugininfo;
 
-import com.jascotty2.JMinecraftFontWidthCalculator;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.LinkedList;
+import me.taylorkelly.help.Help;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.ChatColor;
-import org.bukkit.entity.Player;
 
 /**
  *
@@ -19,12 +16,11 @@ public class PluginInfo extends JavaPlugin {
 
     private String name;
     private String version;
-    private final ChatColor nameColor = ChatColor.YELLOW;
-    private final ChatColor versionColor = ChatColor.AQUA;
-    private final ChatColor textColor = ChatColor.WHITE;
-    private final ChatColor headertColor = ChatColor.DARK_GREEN;
-    private final ChatColor commandColor = ChatColor.YELLOW;
-    private final ChatColor errorColor = ChatColor.RED;
+
+    public static Commands commands;
+    public static Settings settings;
+    public static SettingsXml settingsXml;
+    public static SettingsTxt settingsTxt;
 
     public void onDisable() {
         BukkitLogger.info(name + " " + version + " disabled");
@@ -34,70 +30,47 @@ public class PluginInfo extends JavaPlugin {
         name = this.getDescription().getName();
         version = this.getDescription().getVersion();
 
-        loadSettings();
+        settings = new Settings(this.getDataFolder());
+        settingsXml = new SettingsXml(this.getDataFolder());
+        settingsTxt = new SettingsTxt(this.getDataFolder());
+
+        commands = new Commands(this.getServer());
+
+        registerHelp();
 
         BukkitLogger.info(name + " " + version + " enabled");
-        PluginSaveData.onEnableSave(getVersionsList(), getServerInfo());
-
-        getServerInfo();
-    }
-
-    private void loadSettings(){
-        PluginSettings.initialize(this.getDataFolder());
-        PluginSettingsXml.initialize(this.getDataFolder());
+        DataExport.onEnableSave(getPluginVersionsList(), getServerInfo());
     }
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         String commandName = command.getName().toLowerCase();
 
-        if (commandName.equals("pluginversion")) {
-            LinkedList<String> messages = new LinkedList<String>();
-            boolean console = !(sender instanceof Player);
-
+        if (commandName.equals("plugi") || commandName.equals("plugininfo")) {
             if (args.length == 1) {
-                if (isInteger(args[0])) {
-                    int page = Integer.parseInt(args[0]);
-                    messages = getPage(page, console);
-                } else if (args[0].equalsIgnoreCase("list")) {
-                    messages = getPage(1, console);
-                } else if (args[0].equalsIgnoreCase("reload")) {
-                    loadSettings();
-                } else if (args[0].equalsIgnoreCase("export")) {
-                    boolean save = PluginSaveData.save(getVersionsList(), getServerInfo(), true, false);
-                    messages.add(headertColor.toString() + "Export " + (save ? "succesful" : errorColor.toString() + "failed"));
-                } else if (args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("?")) {
-                    messages = getHelp(console);
+                if (args[0].equalsIgnoreCase("list") || args[0].equalsIgnoreCase("l")) {
+                    commands.getPlugins(sender, getPluginVersionsList(), 1);
+                } else if (args[0].equalsIgnoreCase("reload") || args[0].equalsIgnoreCase("r")) {
+                    commands.reload(sender);
+                } else if (args[0].equalsIgnoreCase("export") || args[0].equalsIgnoreCase("e")) {
+                    commands.export(sender, getPluginVersionsList(), getServerInfo(), null);
+                } else if (args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("h") || args[0].equalsIgnoreCase("?")) {
+                    commands.help(sender);
+                } else {
+                    commands.help(sender);
                 }
             } else if (args.length == 2) {
-                if (args[0].equalsIgnoreCase("list") && isInteger(args[1])) {
-                    int page = Integer.parseInt(args[1]);
-                    messages = getPage(page, console);
-                } else if (args[0].equalsIgnoreCase("list") && args[1].equalsIgnoreCase("all")) {
-                    messages = getAll(console);
-                } else if (args[0].equalsIgnoreCase("export") && args[1].equalsIgnoreCase("list")) {
-                    messages.add(headertColor.toString() + "Available exports: " + nameColor.toString() + "xml html txt");
-                } else if (args[0].equalsIgnoreCase("export") && args[1].equalsIgnoreCase("all")) {
-                    boolean save = PluginSaveData.save(getVersionsList(), getServerInfo(), true, true);
-                    messages.add(headertColor.toString() + "Export " + (save ? "succesful" : errorColor.toString() + "failed"));
-                } else if (args[0].equalsIgnoreCase("export") && !args[1].isEmpty()) {
-                    if (args[1].equalsIgnoreCase("xml")) {
-                        boolean save = PluginSaveData.instance.saveXML(getVersionsList(), getServerInfo(), true);
-                        messages.add(headertColor.toString() + "Export " + (save ? "succesful" : errorColor.toString() + "failed"));
-                    } else if (args[1].equalsIgnoreCase("html")) {
-                        //TODO export
-                    } else if (args[1].equalsIgnoreCase("txt")) {
-                        //TODO export
-                    } else {
-                        messages.add(errorColor.toString() + "Unknown export format.");
-                    }
+                if ((args[0].equalsIgnoreCase("list") || args[0].equalsIgnoreCase("l")) && isInteger(args[1])) {
+                    commands.getPlugins(sender, getPluginVersionsList(), Integer.parseInt(args[1]));
+                } else if ((args[0].equalsIgnoreCase("list") || args[0].equalsIgnoreCase("l")) && args[1].equalsIgnoreCase("all")) {
+                    commands.getAllPlugins(sender, getPluginVersionsList());
+                } else if (args[0].equalsIgnoreCase("export") || args[0].equalsIgnoreCase("e")) {
+                    commands.export(sender, getPluginVersionsList(), getServerInfo(), args[1]);
+                } else {
+                    commands.help(sender);
                 }
             } else {
-                messages = getHelp(console);
-            }
-
-            for (String message : messages) {
-                sender.sendMessage(message);
+                commands.help(sender);
             }
 
             return true;
@@ -106,53 +79,7 @@ public class PluginInfo extends JavaPlugin {
         return false;
     }
 
-    private LinkedList<String> getHelp(boolean console) {
-        LinkedList<String> list = new LinkedList<String>();
-        list.add(headertColor.toString() + "[Plugin Version HELP]");
-        list.add(commandColor.toString() + " /pluginversion list all" + textColor.toString() + " - List all plugins");
-        list.add(commandColor.toString() + " /pluginversion list [#]" + textColor.toString() + " - Detailed list of " + PluginSettings.entriesPerPage + " plugins at a time");
-        list.add(commandColor.toString() + " /pluginversion export" + textColor.toString() + " - Export plugins info into files defined in config.yml");
-        list.add(commandColor.toString() + " /pluginversion export [param]" + textColor.toString() + " - Export plugins info into [param]-type file.");
-        list.add(commandColor.toString() + " /pluginversion export list" + textColor.toString() + " - List of available export file types.");
-        list.add(commandColor.toString() + " /pluginversion export all" + textColor.toString() + " - Export plugins info into all available files");
-        list.add(commandColor.toString() + " /pluginversion reload" + textColor.toString() + " - Reloads the settings");
-        return list;
-    }
-
-    private LinkedList<String> getAll(boolean console) {
-        ArrayList<PluginData> versionList = getVersionsList();
-        LinkedList<String> list = new LinkedList<String>();
-        StringBuilder out = new StringBuilder();
-
-        for (PluginData pluginInfo : versionList) {
-            String t = nameColor.toString() + pluginInfo.getName() + " " + versionColor.toString() + pluginInfo.getVersion() + textColor.toString() + "; ";
-            out.append(t);
-        }
-
-        list.add(out.substring(0, out.length() - 2));
-        return list;
-    }
-
-    private LinkedList<String> getPage(int page, boolean console) {
-        ArrayList<PluginData> versionList = getVersionsList();
-        LinkedList<String> list = new LinkedList<String>();
-
-        if (page < 1 || page > versionList.size() / PluginSettings.entriesPerPage + 1) {
-            list.add(errorColor.toString() + "Page " + page + " does not exist");
-        } else {
-            list.add(headertColor.toString() + "[Plugin Versions HELP " + nameColor.toString() + (page) + "/" + (versionList.size() / PluginSettings.entriesPerPage + 1) + headertColor.toString() + "]");
-            page -= 1;
-            final int maxNameLength = getMaxNameLength(versionList);
-            final int longestNameWidth = getLongestNameWidth(versionList);
-            for (int i = page * PluginSettings.entriesPerPage; i < page * PluginSettings.entriesPerPage + PluginSettings.entriesPerPage && i < versionList.size(); i++) {
-                list.add(console ? getLineConsole(versionList.get(i), maxNameLength) : getLineGame(versionList.get(i), longestNameWidth));
-            }
-        }
-
-        return list;
-    }
-
-    private ArrayList<PluginData> getVersionsList() {
+    private ArrayList<PluginData> getPluginVersionsList() {
         Plugin[] plugins = this.getServer().getPluginManager().getPlugins();
         ArrayList<PluginData> list = new ArrayList<PluginData>(plugins.length);
 
@@ -184,45 +111,23 @@ public class PluginInfo extends JavaPlugin {
         return serverInfo;
     }
 
-    private String getLineConsole(PluginData pluginInfo, int maxNameLength) {
-        StringBuilder out = new StringBuilder(nameColor.toString() + pluginInfo.getName());
-        for (int i = out.length(); i < maxNameLength; i++) {
-            out.append(" ");
+    public void registerHelp() {
+        Plugin p = this.getServer().getPluginManager().getPlugin("Help");
+        if (p != null) {
+            Help helpPlugin = ((Help) p);
+            helpPlugin.registerCommand("help plugi", "Displays help", this, true);
+            helpPlugin.registerCommand("plugi [help|h|?]", "Displays integrated help", this);
+            helpPlugin.registerCommand("plugi list|l [#]", "Displays formatted list of plugins and their versions, page number [#]", this, Permissions.PERMISSION_VIEW);
+            helpPlugin.registerCommand("plugi list|l all", "Displays versions of all plugins", this, Permissions.PERMISSION_VIEW);
+            helpPlugin.registerCommand("plugi export|e", "Exports info about plugins to file types defined in config.yml", this, Permissions.PERMISSION_EXPORT);
+            helpPlugin.registerCommand("plugi export|e list|l", "List of available export types", this, Permissions.PERMISSION_EXPORT);
+            helpPlugin.registerCommand("plugi export|e [param]", "Exports info about plugins to [param]-type file", this, Permissions.PERMISSION_EXPORT_ALL);
+            helpPlugin.registerCommand("plugi export|e all", "Exports info about plugins to all available file types", this, Permissions.PERMISSION_EXPORT_ALL);
+            helpPlugin.registerCommand("plugi reload|r", "Reloads settings", this, Permissions.PERMISSION_RELOAD);
+            BukkitLogger.info("'Help' support enabled.");
+        } else {
+            BukkitLogger.info("'Help' isn't detected. No /help support.");
         }
-        out.append(textColor.toString()).append(" - ");
-        out.append(versionColor.toString()).append(pluginInfo.getVersion());
-        return out.toString();
-    }
-
-    private String getLineGame(PluginData pluginInfo, int maxNameWidth) {
-        StringBuilder out = new StringBuilder(nameColor.toString() + pluginInfo.getName());
-        for (int i = JMinecraftFontWidthCalculator.getStringWidth(pluginInfo.getName()); i < maxNameWidth; i += JMinecraftFontWidthCalculator.getCharWidth(' ')) {
-            out.append(' ');
-        }
-        out.append(textColor.toString()).append(" - ");
-        out.append(versionColor.toString()).append(pluginInfo.getVersion());
-        return out.toString();
-    }
-
-    private int getMaxNameLength(ArrayList<PluginData> list) {
-        int maxLength = 0;
-        for (PluginData pluginInfo : list) {
-            if (pluginInfo.getName().length() > maxLength) {
-                maxLength = pluginInfo.getName().length();
-            }
-        }
-        return maxLength;
-    }
-
-    private int getLongestNameWidth(ArrayList<PluginData> list) {
-        int maxWidth = 0;
-        for (PluginData pluginInfo : list) {
-            int stringWidth = JMinecraftFontWidthCalculator.getStringWidth(pluginInfo.getName());
-            if (stringWidth > maxWidth) {
-                maxWidth = stringWidth;
-            }
-        }
-        return maxWidth;
     }
 
     public static boolean isInteger(String string) {

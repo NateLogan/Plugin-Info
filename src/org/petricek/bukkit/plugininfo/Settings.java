@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.petricek.bukkit.plugininfo;
 
 import java.io.File;
@@ -11,26 +7,33 @@ import org.petricek.bukkit.plugininfo.util.BetterConfig;
  *
  * @author Michal Petříček
  */
-public class PluginSettings {
+public class Settings {
 
-    private static final String settingsFile = "settings.yml";
-    private static BetterConfig config;
-    public static int entriesPerPage;
-    public static String outputFolder;
+    private final String settingsFile = "settings.yml";
+    private final File dataFolder;
+    private BetterConfig config;
+
+    public int entriesPerPage;
+    public String outputFolder;
     
-    public static String xmlFileName;
-    public static String xmlOutputFolder;
-    public static boolean xmlOnEnableSave;
+    public String xmlFileName;
+    public String xmlOutputFolder;
+    public boolean xmlSaveEnabled;
 
-    public static String htmlFileName;
-    public static String htmlOutputFolder;
-    public static boolean htmlOnEnableSave;
+    public String htmlFileName;
+    public String htmlOutputFolder;
+    public boolean htmlSaveEnabled;
 
-    public static String txtFileName;
-    public static String txtOutputFolder;
-    public static boolean txtOnEnableSave;
+    public String txtFileName;
+    public String txtOutputFolder;
+    public boolean txtSaveEnabled;
 
-    public static void initialize(File dataFolder) {
+    public Settings(File dataFolder) {
+        this.dataFolder = dataFolder;
+        initialize();
+    }
+
+    public final void initialize() {
         if (!dataFolder.exists()) {
             dataFolder.mkdirs();
         }
@@ -44,20 +47,20 @@ public class PluginSettings {
 
         xmlFileName = config.getString("xmlFileName", "plugins.xml");
         xmlOutputFolder = config.getString("xmlOutputFolder", "");
-        xmlOnEnableSave = config.getBoolean("xmlOnEnableSave", false);
+        xmlSaveEnabled = config.getBoolean("xmlSaveEnabled", false);
 
         htmlFileName = config.getString("htmlFileName", "plugins.html");
         htmlOutputFolder = config.getString("htmlOutputFolder", "");
-        htmlOnEnableSave = config.getBoolean("htmlOnEnableSave", false);
+        htmlSaveEnabled = config.getBoolean("htmlSaveEnabled", false);
 
         txtFileName = config.getString("txtFileName", "plugins.txt");
         txtOutputFolder = config.getString("txtOutputFolder", "");
-        txtOnEnableSave = config.getBoolean("txtOnEnableSave", false);
+        txtSaveEnabled = config.getBoolean("txtSaveEnabled", false);
 
         save();
     }
 
-    public static boolean save(){
+    public boolean save(){
         return config.save();
     }
 }

@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package org.petricek.bukkit.plugininfo;
 
 import java.io.File;
@@ -11,33 +7,40 @@ import org.petricek.bukkit.plugininfo.util.BetterConfig;
  *
  * @author Michal Petříček
  */
-public class PluginSettingsXml {
+public class SettingsXml {
 
-    private static final String settingsFile = "settings_xml.yml";
-    private static BetterConfig config;
-    public static boolean printCommands;
-    public static boolean printCommandsDetails;
-    public static boolean printDepend;
-    public static boolean printAuthors;
-    public static boolean printDatabaseEnabled;
-    public static boolean printWeb;
-    public static boolean printDesc;
-    public static boolean printFullname;
-    public static boolean printVersion;
-    public static boolean printStats;
-    public static boolean printPluginEnabled;
-    public static boolean printPlugins;
-    public static boolean printGeneratedTime;
-    public static boolean printServerInfo;
-    public static boolean printMinecraftServerInfo;
-    public static boolean printBukkitInfo;
+    private static final String SETTINGS_FILE = "settings_xml.yml";
+    private final File dataFolder;
 
-    public static void initialize(File dataFolder) {
+    private BetterConfig config;
+    public boolean printCommands;
+    public boolean printCommandsDetails;
+    public boolean printDepend;
+    public boolean printAuthors;
+    public boolean printDatabaseEnabled;
+    public boolean printWeb;
+    public boolean printDesc;
+    public boolean printFullname;
+    public boolean printVersion;
+    public boolean printStats;
+    public boolean printPluginEnabled;
+    public boolean printPlugins;
+    public boolean printGeneratedTime;
+    public boolean printServerInfo;
+    public boolean printMinecraftServerInfo;
+    public boolean printBukkitInfo;
+
+    SettingsXml(File dataFolder) {
+        this.dataFolder = dataFolder;
+        initialize();
+    }
+
+    public final void initialize() {
         if (!dataFolder.exists()) {
             dataFolder.mkdirs();
         }
 
-        File configFile = new File(dataFolder, settingsFile);
+        File configFile = new File(dataFolder, SETTINGS_FILE);
         config = new BetterConfig(configFile);
         config.load();
 
@@ -61,7 +64,7 @@ public class PluginSettingsXml {
         save();
     }
 
-    public static boolean save(){
+    public boolean save(){
         return config.save();
     }
 }

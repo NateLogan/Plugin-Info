@@ -1,10 +1,10 @@
 name: PluginInfo
 description: List of plugins and their versions
-version: 0.2
+version: 0.1.0
 author: NateLogan
 main: org.petricek.bukkit.plugininfo.PluginInfo
 commands:
-  pluginversion:
+  plugininfo:
     description: List of plugins and their versions
-    usage: /<command> - Displays plugins verions
-    aliases: [plugv]
+    usage: /<command> - Displays help with further instructions
+    aliases: [plugi]

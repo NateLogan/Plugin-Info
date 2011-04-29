@@ -17,19 +17,19 @@ public class BukkitLogger {
     public static final Logger log = Logger.getLogger("Minecraft");
 
     public static void severe(String string, Exception ex) {
-        log.log(Level.SEVERE, "[PluginVersion] " + string, ex);
+        log.log(Level.SEVERE, "[PluginInfo] " + string, ex);
 
     }
 
     public static void severe(String string) {
-        log.log(Level.SEVERE, "[PluginVersion] " + string);
+        log.log(Level.SEVERE, "[PluginInfo] " + string);
     }
 
     public static void info(String string) {
-        log.log(Level.INFO, "[PluginVersion] " + string);
+        log.log(Level.INFO, "[PluginInfo] " + string);
     }
 
     public static void warning(String string) {
-        log.log(Level.WARNING, "[PluginVersion] " + string);
+        log.log(Level.WARNING, "[PluginInfo] " + string);
     }
 }
