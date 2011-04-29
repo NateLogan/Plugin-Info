@@ -1,13 +1,109 @@
 PluginInfo
 ===========
+View and export (xml, txt) basic info about installed plugins
+Version: v0.1
 
-Changelog
------------
-v0.2.1 - 28.4.2011
-Renamed: PluginVersion -> PluginInfo
+This plugin allows to view versions of installed plugins ingame/via console
+(that's not interesting) and export them to XML and/or TXT file - good for
+further processing.
 
-v0.2.0 - 27.4.2011
-Added XML Export
+[Features:]
+- View basic info about plugins
+- Export basic info about plugins to XML/TXT
+- Supports Help plugin
 
-v0.1.0 - 26.4.2011
-Initial version
+[Commands:]
+Params inside "[ ]" are optional. "|" divides aliases. Using "plugininfo" instead of "plugi" is also possible.
+- plugi [help|h|?] - Displays help
+- plugi list|l [#] - Displays formatted list of plugins and their versions, page number [#]
+- plugi list|l all - Displays versions of all plugins
+- plugi export|e - Exports info about plugins to file types defined in config.yml
+- plugi export|e list|l - List of available export types: XML, TXT
+- plugi export|e [param] - Exports info about plugins to [param]-type file
+- plugi export|e all - Exports info about plugins to all available file types
+- plugi reload|r - Reloads settings
+
+[Permissions/GroupManager nodes:]
+- plugininfo.view - Allows to view installed plugins and their versions
+- plugininfo.export - Allows to invoke manual export (only those exports enabled in config.yml)
+- plugininfo.export.all - Allows to invoke manual export of any kind
+- plugininfo.reload - Allows to reload PluginInfo settings
+
+[Settings:]
+config.yml
+------------------------------------
+#Number of shown plugins per page with command "/plugi list [#]":
+entriesPerPage: 9
+#Default export folder:
+outputFolder: plugins\PluginInfo
+#Enables TXT export:
+txtSaveEnabled: true
+#Output filename for TXT export:
+txtFileName: plugins.txt
+#Specific output folder for TXT export, leave empty for default folder:
+txtOutputFolder: ''
+#Enables XML export:
+xmlSaveEnabled: true
+#Output filename for XML export:
+xmlFileName: plugins.xml
+#Specific output folder for XML export, leave empty for default folder:
+xmlOutputFolder: ''
+
+config_txt.yml
+------------------------------------
+#String dividing plugin name and plugin version:
+delimiter: ' - '
+#String/char used for printing comments:
+commentsChar: '#'
+#Print comments:
+printComments: true
+#Print creation time:
+printTimeStamp: true
+#Print server info (server name, server port):
+printServerInfo: true
+#Print MC server info (MC version):
+printMinecraftServerInfo: true
+#Print CraftBukkit info (version, jenkins build):
+printBukkitInfo: true
+#Print plugins info (name & version):
+printPluginInfo: true
+
+
+config_xml.yml
+------------------------------------
+#Print creation time:
+printGeneratedTime: true
+#Print server info (server name, server port):
+printServerInfo: true
+#Print MC server info (MC version):
+printMinecraftServerInfo: true
+#Print CraftBukkit info (version, jenkins build):
+printBukkitInfo: true
+#Print plugins:
+printPlugins: true
+#Print authors for each plugin (if available):
+printAuthors: true
+#Print plugin description (if available):
+printDesc: true
+#Print fullname of each plugin (name + version):
+printFullname: false
+#Print plugin status (currently not available during initial startup):
+printPluginEnabled: false
+#Print plugin version:
+printVersion: true
+#print commands (if available):
+printCommands: false
+#print command details (if available):
+printCommandsDetails: false
+#Prints "Plugin.isDatabaseEnabled()"...
+printDatabaseEnabled: true
+#Prints plugins required for this plugin to work (if available):
+printDepend: true
+#Print plugins website (if available):
+printWeb: true
+#Print number of plugins:
+printStats: true
+
+[Changelog:]
+v0.1.0 - 29.4.2011
+- Initial version

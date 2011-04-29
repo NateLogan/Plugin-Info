@@ -30,6 +30,7 @@ public class Commands {
         if (sender instanceof Player) {
             player = (Player) sender;
         }
+        boolean console = player == null;
 
         if (permissions.checkPermission(player, Permissions.PERMISSION_VIEW)
                 || permissions.checkPermission(player, Permissions.PERMISSION_EDIT)
@@ -38,22 +39,22 @@ public class Commands {
                 || permissions.checkPermission(player, Permissions.PERMISSION_RELOAD)) {
             sender.sendMessage(headertColor.toString() + "[Plugin Info HELP]");
             if (permissions.checkPermission(player, Permissions.PERMISSION_VIEW)) {
-                sender.sendMessage(commandColor.toString() + " /plugi list|l all" + textColor.toString() + " - List all plugins");
-                sender.sendMessage(commandColor.toString() + " /plugi list|l [#]" + textColor.toString() + " - Detailed list of " + PluginInfo.settings.entriesPerPage + " plugins at a time");
+                sender.sendMessage(commandColor.toString() + (console ? "  " : "/") + "plugi list|l all" + textColor.toString() + " - List all plugins");
+                sender.sendMessage(commandColor.toString() + (console ? "  " : "/") + "plugi list|l [#]" + textColor.toString() + " - Detailed list of " + PluginInfo.settings.entriesPerPage + " plugins at a time");
             }
             if (permissions.checkPermission(player, Permissions.PERMISSION_EXPORT)) {
-                sender.sendMessage(commandColor.toString() + " /plugi export|e" + textColor.toString() + " - Exports plugins info");
-                sender.sendMessage(commandColor.toString() + " /plugi export|e list|l" + textColor.toString() + " - List of available export file types.");
+                sender.sendMessage(commandColor.toString() + (console ? "  " : "/") + "plugi export|e" + textColor.toString() + " - Exports plugins info");
+                sender.sendMessage(commandColor.toString() + (console ? "  " : "/") + "plugi export|e list|l" + textColor.toString() + " - List of available export file types.");
             }
             if (permissions.checkPermission(player, Permissions.PERMISSION_EXPORT_ALL)) {
-                sender.sendMessage(commandColor.toString() + " /plugi export|e [param]" + textColor.toString() + " - Exports plugins info to [param]'s file");
-                sender.sendMessage(commandColor.toString() + " /plugi export|e all" + textColor.toString() + " - Exports plugins info into all available files");
+                sender.sendMessage(commandColor.toString() + (console ? "  " : "/") + "plugi export|e [param]" + textColor.toString() + " - Exports plugins info to [param]'s file");
+                sender.sendMessage(commandColor.toString() + (console ? "  " : "/") + "plugi export|e all" + textColor.toString() + " - Exports plugins info into all available files");
             }
             if (permissions.checkPermission(player, Permissions.PERMISSION_RELOAD)) {
-                sender.sendMessage(commandColor.toString() + " /plugi reload|r" + textColor.toString() + " - Reloads settings");
+                sender.sendMessage(commandColor.toString() + (console ? "  " : "/") + "plugi reload|r" + textColor.toString() + " - Reloads settings");
             }
         } else {
-            sender.sendMessage(errorColor.toString() + "You are not allowed to use command " + commandColor.toString() + "/plugi [help]");
+            sender.sendMessage(errorColor.toString() + "You are not allowed to use command " + commandColor.toString() + (console ? "" : "/") + "plugi [help]");
         }
     }
 
@@ -137,13 +138,13 @@ public class Commands {
                 } else {
                     sender.sendMessage(errorColor.toString() + "You are not allowed to use command " + commandColor.toString() + "/plugi export " + param);
                 }
-            } else if (param.equalsIgnoreCase("html")) {
+            } /*else if (param.equalsIgnoreCase("html")) {
                 if (PluginInfo.settings.htmlSaveEnabled || permissions.checkPermission(player, Permissions.PERMISSION_EXPORT_ALL)){
                     sender.sendMessage(errorColor.toString() + "Not yet available");
                 } else {
                     sender.sendMessage(errorColor.toString() + "You are not allowed to use command " + commandColor.toString() + "/plugi export " + param);
                 }
-            } else {
+            }*/ else {
                 sender.sendMessage(errorColor.toString() + "Unknown export format.");
             }
         } else {

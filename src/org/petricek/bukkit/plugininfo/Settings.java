@@ -20,9 +20,9 @@ public class Settings {
     public String xmlOutputFolder;
     public boolean xmlSaveEnabled;
 
-    public String htmlFileName;
+    /*public String htmlFileName;
     public String htmlOutputFolder;
-    public boolean htmlSaveEnabled;
+    public boolean htmlSaveEnabled;*/
 
     public String txtFileName;
     public String txtOutputFolder;
@@ -49,10 +49,12 @@ public class Settings {
         xmlOutputFolder = config.getString("xmlOutputFolder", "");
         xmlSaveEnabled = config.getBoolean("xmlSaveEnabled", false);
 
+        /*
         htmlFileName = config.getString("htmlFileName", "plugins.html");
         htmlOutputFolder = config.getString("htmlOutputFolder", "");
         htmlSaveEnabled = config.getBoolean("htmlSaveEnabled", false);
-
+        */
+        
         txtFileName = config.getString("txtFileName", "plugins.txt");
         txtOutputFolder = config.getString("txtOutputFolder", "");
         txtSaveEnabled = config.getBoolean("txtSaveEnabled", false);
