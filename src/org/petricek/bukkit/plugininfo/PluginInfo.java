@@ -115,8 +115,8 @@ public class PluginInfo extends JavaPlugin {
         Plugin p = this.getServer().getPluginManager().getPlugin("Help");
         if (p != null) {
             Help helpPlugin = ((Help) p);
-            helpPlugin.registerCommand("help plugi", "Displays help", this, true);
-            helpPlugin.registerCommand("plugi [help|h|?]", "Displays integrated help", this);
+            helpPlugin.registerCommand("help PluginInfo", "Displays PluginInfo help", this, true);
+            helpPlugin.registerCommand("plugi [help|h|?]", "Displays integrated PluginInfo help", this);
             helpPlugin.registerCommand("plugi list|l [#]", "Displays formatted list of plugins and their versions, page number [#]", this, Permissions.PERMISSION_VIEW);
             helpPlugin.registerCommand("plugi list|l all", "Displays versions of all plugins", this, Permissions.PERMISSION_VIEW);
             helpPlugin.registerCommand("plugi export|e", "Exports info about plugins to file types defined in config.yml", this, Permissions.PERMISSION_EXPORT);
