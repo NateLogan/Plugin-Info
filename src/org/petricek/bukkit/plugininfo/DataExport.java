@@ -65,6 +65,11 @@ public class DataExport {
             writer = new MyWriter(file);
 
             writer.writeLine("<?xml version=\"1.0\"?>");
+
+            if(!(settingsXml.xslt == null) && !settingsXml.xslt.isEmpty()){
+                writer.writeLine("<?xml-stylesheet type=\"text/xsl\" href=\"" + settingsXml.xslt +"\"?>");
+            }
+
             writer.writeLine("<!-- " + getDateStamp() + " " + getTimeStamp() + " -->");
             writer.writeLine("<plugin-info>");
             writer.levelIncrease();

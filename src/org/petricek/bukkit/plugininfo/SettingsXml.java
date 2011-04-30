@@ -13,6 +13,8 @@ public class SettingsXml {
     private final File dataFolder;
 
     private BetterConfig config;
+
+    public String xslt;
     public boolean printCommands;
     public boolean printCommandsDetails;
     public boolean printDepend;
@@ -44,6 +46,7 @@ public class SettingsXml {
         config = new BetterConfig(configFile);
         config.load();
 
+        xslt = config.getString("xslt", "");
         printCommands = config.getBoolean("printCommands", false);
         printCommandsDetails = config.getBoolean("printCommandsDetails", false);
         printDepend = config.getBoolean("printDepend", true);

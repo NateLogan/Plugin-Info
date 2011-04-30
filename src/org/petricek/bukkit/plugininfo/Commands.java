@@ -42,7 +42,7 @@ public class Commands {
                 sender.sendMessage(commandColor.toString() + (console ? "  " : "/") + "plugi list|l all" + textColor.toString() + " - List all plugins");
                 sender.sendMessage(commandColor.toString() + (console ? "  " : "/") + "plugi list|l [#]" + textColor.toString() + " - Detailed list of " + PluginInfo.settings.entriesPerPage + " plugins at a time");
             }
-            if (permissions.checkPermission(player, Permissions.PERMISSION_EXPORT)) {
+            if (permissions.checkPermission(player, Permissions.PERMISSION_EXPORT) || permissions.checkPermission(player, Permissions.PERMISSION_EXPORT_ALL)) {
                 sender.sendMessage(commandColor.toString() + (console ? "  " : "/") + "plugi export|e" + textColor.toString() + " - Exports plugins info");
                 sender.sendMessage(commandColor.toString() + (console ? "  " : "/") + "plugi export|e list|l" + textColor.toString() + " - List of available export file types.");
             }
@@ -111,7 +111,7 @@ public class Commands {
             player = (Player) sender;
         }
 
-        if (permissions.checkPermission(player, Permissions.PERMISSION_EXPORT)){
+        if (permissions.checkPermission(player, Permissions.PERMISSION_EXPORT) || permissions.checkPermission(player, Permissions.PERMISSION_EXPORT_ALL)){
             if (param == null || param.isEmpty()) {
                 boolean save = DataExport.save(plugins, serverData, true, false);
                 sender.sendMessage(headertColor.toString() + "Export " + (save ? "succesful" : errorColor.toString() + "failed"));
