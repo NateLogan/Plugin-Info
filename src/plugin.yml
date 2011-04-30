@@ -1,6 +1,6 @@
 name: PluginInfo
 description: List of plugins and their versions
-version: 0.1.0
+version: 0.1.1
 author: NateLogan
 web: http://forums.bukkit.org/threads/15105/
 main: org.petricek.bukkit.plugininfo.PluginInfo

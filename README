@@ -103,7 +103,11 @@ printDepend: true
 printWeb: true
 #Print number of plugins:
 printStats: true
+#Specify XSL-Stylesheet document for XML file, leave empty for none
+xslt: xsl-stylesheet_file.xsl
 
 [Changelog:]
+v0.1.1 - 30.4.2011
+- Added option to specify XSL-Stylesheet document for XML export
 v0.1.0 - 29.4.2011
 - Initial version
