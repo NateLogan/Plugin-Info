@@ -1,7 +1,7 @@
 PluginInfo
 ===========
 View and export (xml, txt) basic info about installed plugins
-Version: v0.1
+Version: v0.1.2
 
 This plugin allows to view versions of installed plugins ingame/via console
 (that's not interesting) and export them to XML and/or TXT file - good for
@@ -11,6 +11,7 @@ further processing.
 - View basic info about plugins
 - Export basic info about plugins to XML/TXT
 - Supports Help plugin
+- FTP export
 
 [Commands:]
 Params inside "[ ]" are optional. "|" divides aliases. Using "plugininfo" instead of "plugi" is also possible.
@@ -21,6 +22,10 @@ Params inside "[ ]" are optional. "|" divides aliases. Using "plugininfo" instea
 - plugi export|e list|l - List of available export types: XML, TXT
 - plugi export|e [param] - Exports info about plugins to [param]-type file
 - plugi export|e all - Exports info about plugins to all available file types
+- plugi upload|u - Uploads all available exported files defined in settings.yml to ftp (if enabled)
+- plugi upload|u all - Uploads all available exported files to ftp (if enabled)
+- plugi upload|u [param] - Uploads specified exported file to ftp (if enabled)
+- plugi upload|u list - List of available files to upload
 - plugi reload|r - Reloads settings
 
 [Permissions/GroupManager nodes:]
@@ -28,6 +33,7 @@ Params inside "[ ]" are optional. "|" divides aliases. Using "plugininfo" instea
 - plugininfo.export - Allows to invoke manual export (only those exports enabled in config.yml)
 - plugininfo.export.all - Allows to invoke manual export of any kind
 - plugininfo.reload - Allows to reload PluginInfo settings
+- plugininfo.upload - Allows to upload exported files
 
 [Settings:]
 config.yml
@@ -67,7 +73,18 @@ printMinecraftServerInfo: true
 printBukkitInfo: true
 #Print plugins info (name & version):
 printPluginInfo: true
-
+#Enables FTP upload:
+ftpEnabled: false
+#If true, files are alway uploaded after exporting:
+ftpAutoUpload false:
+#Path to file on server (for example: "dir/dir/export"):
+ftpPath: ''
+#FTP Username:
+ftpUsername: user
+#FTP Password:
+ftpPasswd: password
+#FTP server address (without ftp://):
+ftpServer: adress.com
 
 config_xml.yml
 ------------------------------------
@@ -107,6 +124,8 @@ printStats: true
 xslt: xsl-stylesheet_file.xsl
 
 [Changelog:]
+v0.1.2 - 4.5.2011
+- Added FTP uploader
 v0.1.1 - 30.4.2011
 - Added option to specify XSL-Stylesheet document for XML export
 v0.1.0 - 29.4.2011

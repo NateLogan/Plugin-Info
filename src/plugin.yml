@@ -1,6 +1,6 @@
 name: PluginInfo
-description: List of plugins and their versions
-version: 0.1.1
+description: View and export (xml, txt) basic info about installed plugins
+version: 0.1.2
 author: NateLogan
 web: http://forums.bukkit.org/threads/15105/
 main: org.petricek.bukkit.plugininfo.PluginInfo

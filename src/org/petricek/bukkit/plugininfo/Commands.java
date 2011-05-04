@@ -1,11 +1,16 @@
 package org.petricek.bukkit.plugininfo;
 
+import org.petricek.bukkit.plugininfo.model.ServerData;
+import org.petricek.bukkit.plugininfo.model.PluginData;
 import com.jascotty2.JMinecraftFontWidthCalculator;
 import java.util.ArrayList;
-import org.bukkit.ChatColor;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.petricek.bukkit.plugininfo.controller.ExportController;
+import org.petricek.bukkit.plugininfo.controller.MessageController;
+import org.petricek.bukkit.plugininfo.integration.FileManager;
+import org.petricek.bukkit.plugininfo.model.ExportType;
 
 /**
  *
@@ -13,16 +18,12 @@ import org.bukkit.entity.Player;
  */
 public class Commands {
 
-    public static final ChatColor nameColor = ChatColor.YELLOW;
-    public static final ChatColor versionColor = ChatColor.AQUA;
-    public static final ChatColor textColor = ChatColor.WHITE;
-    public static final ChatColor headertColor = ChatColor.DARK_GREEN;
-    public static final ChatColor commandColor = ChatColor.YELLOW;
-    public static final ChatColor errorColor = ChatColor.RED;
     private final Permissions permissions;
+    private final ExportController exportController;
 
-    public Commands(Server server) {
-        permissions = new Permissions(server);
+    public Commands(Server server, ExportController exportController) {
+        this.permissions = new Permissions(server);
+        this.exportController = exportController;
     }
 
     public void help(CommandSender sender) {
@@ -36,25 +37,32 @@ public class Commands {
                 || permissions.checkPermission(player, Permissions.PERMISSION_EDIT)
                 || permissions.checkPermission(player, Permissions.PERMISSION_EXPORT)
                 || permissions.checkPermission(player, Permissions.PERMISSION_EXPORT_ALL)
+                || permissions.checkPermission(player, Permissions.PERMISSION_UPLOAD)
                 || permissions.checkPermission(player, Permissions.PERMISSION_RELOAD)) {
-            sender.sendMessage(headertColor.toString() + "[Plugin Info HELP]");
+            MessageController.sendMessage(sender, PluginInfo.headertColor.toString() + "[Plugin Info HELP]");
             if (permissions.checkPermission(player, Permissions.PERMISSION_VIEW)) {
-                sender.sendMessage(commandColor.toString() + (console ? "  " : "/") + "plugi list|l all" + textColor.toString() + " - List all plugins");
-                sender.sendMessage(commandColor.toString() + (console ? "  " : "/") + "plugi list|l [#]" + textColor.toString() + " - Detailed list of " + PluginInfo.settings.entriesPerPage + " plugins at a time");
+                MessageController.sendMessage(sender, PluginInfo.commandColor.toString() + (console ? "" : "/") + "plugi list|l all" + PluginInfo.textColor.toString() + " - List all plugins");
+                MessageController.sendMessage(sender, PluginInfo.commandColor.toString() + (console ? "" : "/") + "plugi list|l [#]" + PluginInfo.textColor.toString() + " - Detailed list of " + PluginInfo.settings.entriesPerPage + " plugins at a time");
             }
             if (permissions.checkPermission(player, Permissions.PERMISSION_EXPORT) || permissions.checkPermission(player, Permissions.PERMISSION_EXPORT_ALL)) {
-                sender.sendMessage(commandColor.toString() + (console ? "  " : "/") + "plugi export|e" + textColor.toString() + " - Exports plugins info");
-                sender.sendMessage(commandColor.toString() + (console ? "  " : "/") + "plugi export|e list|l" + textColor.toString() + " - List of available export file types.");
+                MessageController.sendMessage(sender, PluginInfo.commandColor.toString() + (console ? "" : "/") + "plugi export|e" + PluginInfo.textColor.toString() + " - Exports plugins info");
+                MessageController.sendMessage(sender, PluginInfo.commandColor.toString() + (console ? "" : "/") + "plugi export|e list|l" + PluginInfo.textColor.toString() + " - List of available export file types.");
             }
             if (permissions.checkPermission(player, Permissions.PERMISSION_EXPORT_ALL)) {
-                sender.sendMessage(commandColor.toString() + (console ? "  " : "/") + "plugi export|e [param]" + textColor.toString() + " - Exports plugins info to [param]'s file");
-                sender.sendMessage(commandColor.toString() + (console ? "  " : "/") + "plugi export|e all" + textColor.toString() + " - Exports plugins info into all available files");
+                MessageController.sendMessage(sender, PluginInfo.commandColor.toString() + (console ? "" : "/") + "plugi export|e [param]" + PluginInfo.textColor.toString() + " - Exports plugins info to [param]'s file");
+                MessageController.sendMessage(sender, PluginInfo.commandColor.toString() + (console ? "" : "/") + "plugi export|e all" + PluginInfo.textColor.toString() + " - Exports plugins info into all available files");
+            }
+            if (permissions.checkPermission(player, Permissions.PERMISSION_UPLOAD)) {
+                MessageController.sendMessage(sender, PluginInfo.commandColor.toString() + (console ? "" : "/") + "plugi upload|u" + PluginInfo.textColor.toString() + " - Uploads generated files defined in config.yml to ftp server");
+                MessageController.sendMessage(sender, PluginInfo.commandColor.toString() + (console ? "" : "/") + "plugi upload|u list|l" + PluginInfo.textColor.toString() + " - List available files to upload");
+                MessageController.sendMessage(sender, PluginInfo.commandColor.toString() + (console ? "" : "/") + "plugi upload|u [param]" + PluginInfo.textColor.toString() + " - Uploads generated [param] file to ftp server");
+                MessageController.sendMessage(sender, PluginInfo.commandColor.toString() + (console ? "" : "/") + "plugi upload|u all" + PluginInfo.textColor.toString() + " - Uploads all generated files to ftp server");
             }
             if (permissions.checkPermission(player, Permissions.PERMISSION_RELOAD)) {
-                sender.sendMessage(commandColor.toString() + (console ? "  " : "/") + "plugi reload|r" + textColor.toString() + " - Reloads settings");
+                MessageController.sendMessage(sender, PluginInfo.commandColor.toString() + (console ? "" : "/") + "plugi reload|r" + PluginInfo.textColor.toString() + " - Reloads settings");
             }
         } else {
-            sender.sendMessage(errorColor.toString() + "You are not allowed to use command " + commandColor.toString() + (console ? "" : "/") + "plugi [help]");
+            MessageController.sendMessage(sender, PluginInfo.errorColor.toString() + "You are not allowed to use command " + PluginInfo.commandColor.toString() + (console ? "" : "/") + "plugi [help]");
         }
     }
 
@@ -64,16 +72,16 @@ public class Commands {
             player = (Player) sender;
         }
 
-        if (permissions.checkPermission(player, Permissions.PERMISSION_VIEW)){
+        if (permissions.checkPermission(player, Permissions.PERMISSION_VIEW)) {
             StringBuilder out = new StringBuilder();
             for (PluginData pluginInfo : plugins) {
-                String t = nameColor.toString() + pluginInfo.getName() + " "
-                        + versionColor.toString() + pluginInfo.getVersion() + textColor.toString() + "; ";
+                String t = PluginInfo.nameColor.toString() + pluginInfo.getName() + " "
+                        + PluginInfo.versionColor.toString() + pluginInfo.getVersion() + PluginInfo.textColor.toString() + "; ";
                 out.append(t);
             }
-            sender.sendMessage(out.substring(0, out.length() - 2));
+            MessageController.sendMessage(sender, out.substring(0, out.length() - 2));
         } else {
-            sender.sendMessage(errorColor.toString() + "You are not allowed to use command " + commandColor.toString() + "/plugi list all");
+            MessageController.sendMessage(sender, PluginInfo.errorColor.toString() + "You are not allowed to use command " + PluginInfo.commandColor.toString() + "/plugi list all");
         }
 
     }
@@ -86,22 +94,22 @@ public class Commands {
             console = false;
         }
 
-        if (permissions.checkPermission(player, Permissions.PERMISSION_VIEW)){
+        if (permissions.checkPermission(player, Permissions.PERMISSION_VIEW)) {
             int entriesPerPage = PluginInfo.settings.entriesPerPage;
             if (page < 1 || page > plugins.size() / entriesPerPage + 1) {
-                sender.sendMessage(errorColor.toString() + "Page " + page + " does not exist");
+                MessageController.sendMessage(sender, PluginInfo.errorColor.toString() + "Page " + page + " does not exist");
             } else {
-                sender.sendMessage(headertColor.toString() + "[Plugin Info], page ["
-                        + nameColor.toString() + (page) + "/" + (plugins.size() / entriesPerPage + 1) + headertColor.toString() + "]");
+                MessageController.sendMessage(sender, PluginInfo.headertColor.toString() + "[Plugin Info], page ["
+                        + PluginInfo.nameColor.toString() + (page) + "/" + (plugins.size() / entriesPerPage + 1) + PluginInfo.headertColor.toString() + "]");
                 page -= 1;
                 final int maxNameLength = getMaxNameLength(plugins);
                 final int longestNameWidth = getLongestNameWidth(plugins);
                 for (int i = page * entriesPerPage; i < page * entriesPerPage + entriesPerPage && i < plugins.size(); i++) {
-                    sender.sendMessage(console ? getLineConsole(plugins.get(i), maxNameLength) : getLineGame(plugins.get(i), longestNameWidth));
+                    MessageController.sendMessage(sender, console ? getLineConsole(plugins.get(i), maxNameLength) : getLineGame(plugins.get(i), longestNameWidth));
                 }
             }
         } else {
-            sender.sendMessage(errorColor.toString() + "You are not allowed to use command " + commandColor.toString() + "/plugi list [#]");
+            MessageController.sendMessage(sender, PluginInfo.errorColor.toString() + "You are not allowed to use command " + PluginInfo.commandColor.toString() + "/plugi list [#]");
         }
     }
 
@@ -111,44 +119,40 @@ public class Commands {
             player = (Player) sender;
         }
 
-        if (permissions.checkPermission(player, Permissions.PERMISSION_EXPORT) || permissions.checkPermission(player, Permissions.PERMISSION_EXPORT_ALL)){
+        if (permissions.checkPermission(player, Permissions.PERMISSION_EXPORT) || permissions.checkPermission(player, Permissions.PERMISSION_EXPORT_ALL)) {
             if (param == null || param.isEmpty()) {
-                boolean save = DataExport.save(plugins, serverData, true, false);
-                sender.sendMessage(headertColor.toString() + "Export " + (save ? "succesful" : errorColor.toString() + "failed"));
+                exportController.export(sender, ExportType.DEFAULT);
             } else if (param.equalsIgnoreCase("list") || param.equalsIgnoreCase("l")) {
-                sender.sendMessage(headertColor.toString() + "Available exports: " + nameColor.toString() + "xml txt" /*+ " html"*/);
+                MessageController.sendMessage(sender, PluginInfo.headertColor.toString() + "Available exports: " + PluginInfo.nameColor.toString() + "xml txt" /*+ " html"*/);
             } else if (param.equalsIgnoreCase("all") || param.equalsIgnoreCase("force")) {
-                if (permissions.checkPermission(player, Permissions.PERMISSION_EXPORT_ALL)){
-                    boolean save = DataExport.save(plugins, serverData, true, true);
-                    sender.sendMessage(headertColor.toString() + "Export " + (save ? "succesful" : errorColor.toString() + "failed"));
+                if (permissions.checkPermission(player, Permissions.PERMISSION_EXPORT_ALL)) {
+                    exportController.export(sender, ExportType.ALL);
                 } else {
-                    sender.sendMessage(errorColor.toString() + "You are not allowed to use command " + commandColor.toString() + "/plugi export " + param);
+                    MessageController.sendMessage(sender, PluginInfo.errorColor.toString() + "You are not allowed to use command " + PluginInfo.commandColor.toString() + "/plugi export " + param);
                 }
             } else if (param.equalsIgnoreCase("xml")) {
-                if (PluginInfo.settings.xmlSaveEnabled || permissions.checkPermission(player, Permissions.PERMISSION_EXPORT_ALL)){
-                    boolean save = DataExport.instance.saveXML(plugins, serverData, true);
-                    sender.sendMessage(headertColor.toString() + "XML export " + (save ? "succesful" : errorColor.toString() + "failed"));
+                if (PluginInfo.settings.xmlSaveEnabled || permissions.checkPermission(player, Permissions.PERMISSION_EXPORT_ALL)) {
+                    exportController.export(sender, ExportType.XML);
                 } else {
-                    sender.sendMessage(errorColor.toString() + "You are not allowed to use command " + commandColor.toString() + "/plugi export " + param);
+                    MessageController.sendMessage(sender, PluginInfo.errorColor.toString() + "You are not allowed to use command " + PluginInfo.commandColor.toString() + "/plugi export " + param);
                 }
             } else if (param.equalsIgnoreCase("txt")) {
-                if (PluginInfo.settings.txtSaveEnabled || permissions.checkPermission(player, Permissions.PERMISSION_EXPORT_ALL)){
-                    boolean save = DataExport.instance.saveTXT(plugins, serverData);
-                    sender.sendMessage(headertColor.toString() + "TXT export " + (save ? "succesful" : errorColor.toString() + "failed"));
+                if (PluginInfo.settings.txtSaveEnabled || permissions.checkPermission(player, Permissions.PERMISSION_EXPORT_ALL)) {
+                    exportController.export(sender, ExportType.TXT);
                 } else {
-                    sender.sendMessage(errorColor.toString() + "You are not allowed to use command " + commandColor.toString() + "/plugi export " + param);
+                    MessageController.sendMessage(sender, PluginInfo.errorColor.toString() + "You are not allowed to use command " + PluginInfo.commandColor.toString() + "/plugi export " + param);
                 }
             } /*else if (param.equalsIgnoreCase("html")) {
-                if (PluginInfo.settings.htmlSaveEnabled || permissions.checkPermission(player, Permissions.PERMISSION_EXPORT_ALL)){
-                    sender.sendMessage(errorColor.toString() + "Not yet available");
-                } else {
-                    sender.sendMessage(errorColor.toString() + "You are not allowed to use command " + commandColor.toString() + "/plugi export " + param);
-                }
+            if (PluginInfo.settings.htmlSaveEnabled || permissions.checkPermission(player, Permissions.PERMISSION_EXPORT_ALL)){
+            sender.sendMessage(errorColor.toString() + "Not yet available");
+            } else {
+            sender.sendMessage(errorColor.toString() + "You are not allowed to use command " + commandColor.toString() + "/plugi export " + param);
+            }
             }*/ else {
-                sender.sendMessage(errorColor.toString() + "Unknown export format.");
+                MessageController.sendMessage(sender, PluginInfo.errorColor.toString() + "Unknown export format.");
             }
         } else {
-            sender.sendMessage(errorColor.toString() + "You are not allowed to use command " + commandColor.toString() + "/plugi export " + param);
+            MessageController.sendMessage(sender, PluginInfo.errorColor.toString() + "You are not allowed to use command " + PluginInfo.commandColor.toString() + "/plugi export " + param);
         }
     }
 
@@ -157,36 +161,74 @@ public class Commands {
         if (sender instanceof Player) {
             player = (Player) sender;
         }
-        
-        if (permissions.checkPermission(player, Permissions.PERMISSION_EXPORT)){
+
+        if (permissions.checkPermission(player, Permissions.PERMISSION_EXPORT)) {
             PluginInfo.settings.initialize();
             PluginInfo.settingsXml.initialize();
-            sender.sendMessage(headertColor.toString() + "[PluginInfo] Settings reloaded");
+            MessageController.sendMessage(sender, PluginInfo.headertColor.toString() + "Settings reloaded");
         } else {
-            sender.sendMessage(errorColor.toString() + "You are not allowed to use command " + commandColor.toString() + "/plugi reload");
+            MessageController.sendMessage(sender,
+                    PluginInfo.errorColor.toString() + "You are not allowed to use command "
+                    + PluginInfo.commandColor.toString() + "/plugi reload");
         }
 
+    }
+
+    public void upload(CommandSender sender, String param) {
+        if(param.equalsIgnoreCase("all")){
+            upload(sender, ExportType.ALL);
+        }else if(param.equalsIgnoreCase("list") || param.equalsIgnoreCase("l")){
+            String list = "";
+            if(FileManager.fileExists(PluginInfo.settings.getTxtOutputFile())) list += "txt";
+            if(FileManager.fileExists(PluginInfo.settings.getXmlOutputFile())) list += " xml";
+            MessageController.sendMessage(sender, PluginInfo.headertColor.toString() + "Available uploads: "
+                    + PluginInfo.nameColor.toString() + list);
+        }else if(param.equalsIgnoreCase("xml")){
+            upload(sender, ExportType.XML);
+        }else if(param.equalsIgnoreCase("txt")){
+            upload(sender, ExportType.TXT);
+        }else {
+            MessageController.sendMessage(sender,
+                    PluginInfo.errorColor.toString() + "Unknown parameter: " + param);
+        }
+    }
+
+    public void upload(CommandSender sender, ExportType type) {
+        Player player = null;
+        if (sender instanceof Player) {
+            player = (Player) sender;
+        }
+
+        if (permissions.checkPermission(player, Permissions.PERMISSION_UPLOAD)) {
+            if (!PluginInfo.settings.ftpEnabled) {
+                MessageController.sendMessage(sender, PluginInfo.errorColor.toString() + "FTP upload is not enabled!");
+                return;
+            }
+            exportController.upload(sender, type);
+        } else {
+            MessageController.sendMessage(sender, PluginInfo.errorColor.toString() + "You are not allowed to use command " + PluginInfo.commandColor.toString() + "/plugi upload");
+        }
     }
 
     //--------------------------------------------------------------------------
     private String getLineConsole(PluginData pluginData, int maxNameLength) {
-        StringBuilder out = new StringBuilder(nameColor.toString() + pluginData.getName());
+        StringBuilder out = new StringBuilder(PluginInfo.nameColor.toString() + pluginData.getName());
         for (int i = out.length(); i < maxNameLength; i++) {
             out.append(" ");
         }
-        out.append(textColor.toString()).append(" - ");
-        out.append(versionColor.toString()).append(pluginData.getVersion());
+        out.append(PluginInfo.textColor.toString()).append(" - ");
+        out.append(PluginInfo.versionColor.toString()).append(pluginData.getVersion());
         return out.toString();
     }
 
     private String getLineGame(PluginData pluginData, int maxNameWidth) {
-        StringBuilder out = new StringBuilder(nameColor.toString() + pluginData.getName());
+        StringBuilder out = new StringBuilder(PluginInfo.nameColor.toString() + pluginData.getName());
         for (int i = JMinecraftFontWidthCalculator.getStringWidth(pluginData.getName());
                 i < maxNameWidth; i += JMinecraftFontWidthCalculator.getCharWidth(' ')) {
             out.append(' ');
         }
-        out.append(textColor.toString()).append(" - ");
-        out.append(versionColor.toString()).append(pluginData.getVersion());
+        out.append(PluginInfo.textColor.toString()).append(" - ");
+        out.append(PluginInfo.versionColor.toString()).append(pluginData.getVersion());
         return out.toString();
     }
 
@@ -210,4 +252,5 @@ public class Commands {
         }
         return maxWidth;
     }
+
 }

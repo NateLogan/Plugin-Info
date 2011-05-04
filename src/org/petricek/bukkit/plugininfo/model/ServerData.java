@@ -1,4 +1,4 @@
-package org.petricek.bukkit.plugininfo;
+package org.petricek.bukkit.plugininfo.model;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

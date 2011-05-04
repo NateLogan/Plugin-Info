@@ -17,6 +17,7 @@ public class Permissions {
     public static final String PERMISSION_EXPORT_ALL = "plugininfo.export.all";
     public static final String PERMISSION_RELOAD = "plugininfo.reload";
     public static final String PERMISSION_EDIT = "plugininfo.edit";
+    public static final String PERMISSION_UPLOAD = "plugininfo.upload";
 
     private final PermissionsEntity permissions;
 

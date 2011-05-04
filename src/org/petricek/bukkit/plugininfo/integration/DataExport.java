@@ -1,4 +1,4 @@
-package org.petricek.bukkit.plugininfo;
+package org.petricek.bukkit.plugininfo.integration;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -8,6 +8,13 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.LinkedHashMap;
 import java.util.Map.Entry;
+import org.petricek.bukkit.plugininfo.BukkitLogger;
+import org.petricek.bukkit.plugininfo.model.PluginData;
+import org.petricek.bukkit.plugininfo.PluginInfo;
+import org.petricek.bukkit.plugininfo.model.ServerData;
+import org.petricek.bukkit.plugininfo.Settings;
+import org.petricek.bukkit.plugininfo.SettingsTxt;
+import org.petricek.bukkit.plugininfo.SettingsXml;
 
 /**
  *
@@ -16,34 +23,6 @@ import java.util.Map.Entry;
 public class DataExport {
 
     public static DataExport instance = new DataExport();
-
-    public static boolean onEnableSave(ArrayList<PluginData> pluginList, ServerData serverData) {
-        return save(pluginList, serverData, false, false);
-    }
-
-    public static boolean save(ArrayList<PluginData> pluginList, ServerData serverData, boolean printPluginStates, boolean force) {
-        boolean success = true;
-
-        if (PluginInfo.settings.xmlSaveEnabled || force) {
-            BukkitLogger.info("XML export started...");
-            if (!instance.saveXML(pluginList, serverData, printPluginStates)) {
-                success = false;
-                BukkitLogger.info("XML export failed.");
-            } else {
-                BukkitLogger.info("XML export successfully finished.");
-            }
-        }
-        if (PluginInfo.settings.txtSaveEnabled || force) {
-            BukkitLogger.info("TXT export started...");
-            if (!instance.saveTXT(pluginList, serverData)) {
-                success = false;
-                BukkitLogger.info("TXT export failed.");
-            } else {
-                BukkitLogger.info("TXT export successfully finished.");
-            }
-        }
-        return success;
-    }
 
     public boolean saveXML(ArrayList<PluginData> pluginList, ServerData serverInfo, boolean printPluginStates) {
         final SettingsXml settingsXml = PluginInfo.settingsXml;
@@ -62,7 +41,7 @@ public class DataExport {
         boolean success = true;
         MyWriter writer = null;
         try {
-            writer = new MyWriter(file);
+            writer = new MyWriterFile(file);
 
             writer.writeLine("<?xml version=\"1.0\"?>");
 
@@ -200,10 +179,10 @@ public class DataExport {
                                                             }
 
                                                             if (commandDetailValue instanceof String) {
-                                                                printCommandDetail((String) entryCommand.getKey(), (String) commandDetailKey, (String) commandDetailValue, writer);
+                                                                printCommandDetailXml((String) entryCommand.getKey(), (String) commandDetailKey, (String) commandDetailValue, writer);
                                                             } else if (commandDetailValue instanceof ArrayList) {
                                                                 for (Object commandDetailValuePart : (ArrayList) commandDetailValue) {
-                                                                    printCommandDetail((String) entryCommand.getKey(), (String) commandDetailKey, (String) commandDetailValuePart, writer);
+                                                                    printCommandDetailXml((String) entryCommand.getKey(), (String) commandDetailKey, (String) commandDetailValuePart, writer);
                                                                 }
                                                             } else {
                                                                 BukkitLogger.warning("Unknown entry: " + commandDetailValue + ", "
@@ -298,7 +277,7 @@ public class DataExport {
         MyWriter writer = null;
 
         try {
-            writer = new MyWriter(file);
+            writer = new MyWriterFile(file);
             if (settingsTxt.printComments && settingsTxt.printTimeStamp) {
                 writer.writeLine(settingsTxt.commentsChar + getDateStamp() + " " + getTimeStamp());
                 writer.writeLine();
@@ -338,7 +317,7 @@ public class DataExport {
         return success;
     }
 
-    public static String getDateStamp() {
+    private static String getDateStamp() {
         Calendar cal = Calendar.getInstance();
         String out = "";
         int year = cal.get(Calendar.YEAR);
@@ -352,7 +331,7 @@ public class DataExport {
         return out;
     }
 
-    public static String getTimeStamp() {
+    private static String getTimeStamp() {
         Calendar cal = Calendar.getInstance();
         String out = "";
         int hour = cal.get(Calendar.HOUR_OF_DAY);
@@ -376,7 +355,7 @@ public class DataExport {
         return s;
     }
 
-    private static void printCommandDetail(String command, String key, String value, MyWriter writer) throws IOException {
+    private static void printCommandDetailXml(String command, String key, String value, MyWriter writer) throws IOException {
         key = normalizeXml(key);
         command = normalizeXml(command);
         value = value.replaceAll("<command>", command);
@@ -390,13 +369,22 @@ public class DataExport {
 
     }
 
-    private class MyWriter {
+    private interface MyWriter{
+        public void writeLine(String line) throws IOException;
+        public void writeLine() throws IOException;
+        public boolean close();
+        public void levelIncrease();
+        public void levelDecrease();
+        public String getLevel();
+    }
+
+    private class MyWriterFile implements MyWriter {
 
         private BufferedWriter writer;
         private int level = 0;
         private static final String ONE_LEVEL = "    ";
 
-        public MyWriter(File file) throws IOException {
+        public MyWriterFile(File file) throws IOException {
             if (!file.getParentFile().exists()) {
                 file.getParentFile().mkdirs();
             }
@@ -426,17 +414,17 @@ public class DataExport {
             return true;
         }
 
-        private void levelIncrease() {
+        public void levelIncrease() {
             level++;
         }
 
-        private void levelDecrease() {
+        public void levelDecrease() {
             if (level > 0) {
                 level--;
             }
         }
 
-        private String getLevel() {
+        public String getLevel() {
             String lvl = "";
             for (int i = 0; i < level; i++) {
                 lvl += ONE_LEVEL;

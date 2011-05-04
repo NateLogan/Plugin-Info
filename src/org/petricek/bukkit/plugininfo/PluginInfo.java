@@ -1,12 +1,17 @@
 package org.petricek.bukkit.plugininfo;
 
+import org.petricek.bukkit.plugininfo.model.ServerData;
+import org.petricek.bukkit.plugininfo.model.PluginData;
 import java.util.ArrayList;
 import java.util.Collections;
 import me.taylorkelly.help.Help;
+import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.petricek.bukkit.plugininfo.controller.ExportController;
+import org.petricek.bukkit.plugininfo.model.ExportType;
 
 /**
  *
@@ -17,10 +22,18 @@ public class PluginInfo extends JavaPlugin {
     private String name;
     private String version;
 
+    public static ExportController exportController;
     public static Commands commands;
     public static Settings settings;
     public static SettingsXml settingsXml;
     public static SettingsTxt settingsTxt;
+
+    public static final ChatColor nameColor = ChatColor.YELLOW;
+    public static final ChatColor versionColor = ChatColor.AQUA;
+    public static final ChatColor textColor = ChatColor.WHITE;
+    public static final ChatColor headertColor = ChatColor.DARK_GREEN;
+    public static final ChatColor commandColor = ChatColor.YELLOW;
+    public static final ChatColor errorColor = ChatColor.RED;
 
     public void onDisable() {
         BukkitLogger.info(name + " " + version + " disabled");
@@ -34,12 +47,15 @@ public class PluginInfo extends JavaPlugin {
         settingsXml = new SettingsXml(this.getDataFolder());
         settingsTxt = new SettingsTxt(this.getDataFolder());
 
-        commands = new Commands(this.getServer());
+        exportController = new ExportController(this.getServer());
+        commands = new Commands(this.getServer(), exportController);
+        
 
         registerHelp();
 
         BukkitLogger.info(name + " " + version + " enabled");
-        DataExport.onEnableSave(getPluginVersionsList(), getServerInfo());
+        
+        exportController.export(ExportType.DEFAULT);
     }
 
     @Override
@@ -54,6 +70,8 @@ public class PluginInfo extends JavaPlugin {
                     commands.reload(sender);
                 } else if (args[0].equalsIgnoreCase("export") || args[0].equalsIgnoreCase("e")) {
                     commands.export(sender, getPluginVersionsList(), getServerInfo(), null);
+                } else if (args[0].equalsIgnoreCase("upload") || args[0].equalsIgnoreCase("u")) {
+                    commands.upload(sender, ExportType.DEFAULT);
                 } else if (args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("h") || args[0].equalsIgnoreCase("?")) {
                     commands.help(sender);
                 } else {
@@ -66,6 +84,8 @@ public class PluginInfo extends JavaPlugin {
                     commands.getAllPlugins(sender, getPluginVersionsList());
                 } else if (args[0].equalsIgnoreCase("export") || args[0].equalsIgnoreCase("e")) {
                     commands.export(sender, getPluginVersionsList(), getServerInfo(), args[1]);
+                } else if ((args[0].equalsIgnoreCase("upload") || args[0].equalsIgnoreCase("u"))) {
+                    commands.upload(sender, args[1]);
                 } else {
                     commands.help(sender);
                 }
@@ -123,6 +143,10 @@ public class PluginInfo extends JavaPlugin {
             helpPlugin.registerCommand("plugi export|e list|l", "List of available export types", this, Permissions.PERMISSION_EXPORT);
             helpPlugin.registerCommand("plugi export|e [param]", "Exports info about plugins to [param]-type file", this, Permissions.PERMISSION_EXPORT_ALL);
             helpPlugin.registerCommand("plugi export|e all", "Exports info about plugins to all available file types", this, Permissions.PERMISSION_EXPORT_ALL);
+            helpPlugin.registerCommand("plugi upload|u", "Uploads all available exported files defined in settings.yml to ftp (if enabled)", this, Permissions.PERMISSION_UPLOAD);
+            helpPlugin.registerCommand("plugi upload|u all", "Uploads all available exported files to ftp (if enabled)", this, Permissions.PERMISSION_UPLOAD);
+            helpPlugin.registerCommand("plugi upload|u [param]", "Uploads specified exported file to ftp (if enabled)", this, Permissions.PERMISSION_UPLOAD);
+            helpPlugin.registerCommand("plugi upload|u list", "List of available files to upload", this, Permissions.PERMISSION_UPLOAD);
             helpPlugin.registerCommand("plugi reload|r", "Reloads settings", this, Permissions.PERMISSION_RELOAD);
             BukkitLogger.info("'Help' support enabled.");
         } else {

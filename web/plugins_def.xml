@@ -1,0 +1,231 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plugins [
+<!ATTLIST website title CDATA #IMPLIED>
+<!ELEMENT website (#PCDATA)>
+<!ELEMENT type (#PCDATA)>
+<!ELEMENT plugins (plugin*)>
+<!ELEMENT plugin (name, (type|website|description|bukkit-forum)*)>
+<!ELEMENT name (#PCDATA)>
+<!ELEMENT bukkit-forum (#PCDATA)>
+]>
+<plugins>
+    <plugin>
+        <name>MessageChanger</name>
+        <type>ADMN</type>
+        <bukkit-forum>13315</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name>LightSwitch</name>
+        <type>MECH</type>
+        <bukkit-forum>12959</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name>Essentials</name>
+        <type>GEN</type>
+        <bukkit-forum>1262</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name>EssentialsGroupManager</name>
+        <type>ADMN</type>
+        <type>INFO</type>
+        <bukkit-forum>4723</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name>AntiBuild</name>
+        <type>SEC</type>
+        <bukkit-forum>6771</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name>iChat</name>
+        <type>CHAT</type>
+        <bukkit-forum>5857</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name>Vanish</name>
+        <type>ADMN</type>
+        <type>SEC</type>
+        <bukkit-forum>345</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name>LevelCraft</name>
+        <type>MECH</type>
+        <bukkit-forum>2261</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name>LogBlock</name>
+        <type>INFO</type>
+        <type>ADMN</type>
+        <bukkit-forum>4543</bukkit-forum>
+        <website title="Homepage">http://diddiz.insane-architects.net/logblock.php</website>
+    </plugin>
+    <plugin>
+        <name>PetitionPlugin</name>
+        <type>ADMN</type>
+        <bukkit-forum>1347</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name>PlugMan</name>
+        <type>ADMN</type>
+        <type>GEN</type>
+        <bukkit-forum>5167</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name>Residence</name>
+        <type>SEC</type>
+        <type>MECH</type>
+        <type>ECON</type>
+        <bukkit-forum>9358</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name>MCBans</name>
+        <type>ADMN</type>
+        <type>SEC</type>
+        <bukkit-forum>94</bukkit-forum>
+        <website title="Homepage">http://mcbans.com/</website>
+        <website title="Bans">http://mcbans.com/server/server-name</website>
+    </plugin>
+    <plugin>
+        <name>Runecraft</name>
+        <type>MISC</type>
+        <website title="Homepage">http://www.minecraftforum.net/viewtopic.php?f=1012&amp;t=29244</website>
+        <website title="Runes">http://www.minecraftwiki.net/wiki/Runecraft</website>
+    </plugin>
+    <plugin>
+        <name>MyHome</name>
+        <type>TP</type>
+        <bukkit-forum>13313</bukkit-forum>
+        <website title="Old Version">http://forums.bukkit.org/threads/249</website>
+    </plugin>
+    <plugin>
+        <name>WorldEdit</name>
+        <type>EDIT</type>
+        <type>SEC</type>
+        <bukkit-forum>62</bukkit-forum>
+        <website title="Homepage">http://wiki.sk89q.com/wiki/WorldEdit</website>
+        <website title="Commands">http://wiki.sk89q.com/wiki/WorldEdit/Reference</website>
+        <website title="Tutorial">http://wiki.sk89q.com/wiki/WorldEdit/Quick_start</website>
+    </plugin>
+    <plugin>
+        <name>Help</name>
+        <type>INFO</type>
+        <bukkit-forum>13601</bukkit-forum>
+        <website title="Old Version"></website>
+    </plugin>
+    <plugin>
+        <name>iConomy</name>
+        <type>ECON</type>
+        <bukkit-forum>40</bukkit-forum>
+        <website title="Commands">http://iconomy.nexua.org/Main/Commands</website>
+    </plugin>
+    <plugin>
+        <name>Stargate</name>
+        <type>TP</type>
+        <bukkit-forum>3927</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name>Stargate-DHD</name>
+        <type>MISC</type>
+        <bukkit-forum>9738</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name>PumpkinDiver</name>
+        <type>MECH</type>
+        <bukkit-forum>3347</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name>Jail</name>
+        <type>ADMN</type>
+        <bukkit-forum>1912</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name>iConomyChestShop</name>
+        <type>ECON</type>
+        <bukkit-forum>4150</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name>LWC</name>
+        <type>SEC</type>
+        <type>MECH</type>
+        <bukkit-forum>967</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name>Elevators</name>
+        <type>MECH</type>
+        <bukkit-forum>2584</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name>CommandHelper</name>
+        <type>MISC</type>
+        <bukkit-forum>4669</bukkit-forum>
+        <website title="Homepage">http://wiki.sk89q.com/wiki/CommandHelper</website>
+    </plugin>
+    <plugin>
+        <name>MCDocs</name>
+        <type>INFO</type>
+        <bukkit-forum>894</bukkit-forum>
+        <website title="Wiki">http://atajsic.com/wiki/index.php/MCDocs</website>
+    </plugin>
+    <plugin>
+        <name>Tombstone</name>
+        <type>MISC</type>
+        <bukkit-forum>3923</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name>Stats</name>
+        <type>INFO</type>
+        <bukkit-forum>1328</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name>Achievements</name>
+        <type>INFO</type>
+        <bukkit-forum>1328</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name>MultiVerse</name>
+        <type>MISC</type>
+        <type>TP</type>
+        <type>FUN</type>
+        <bukkit-forum>3707</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name>MeasuringTape</name>
+        <type>TOOL</type>
+        <bukkit-forum>1747</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name>MinecartManiaCore</name>
+        <type>MECH</type>
+        <bukkit-forum>388</bukkit-forum>
+        <website title="Wiki">http://wiki.afforess.com/Minecart_Mania-Plugin</website>
+    </plugin>
+    <plugin>
+        <name>Dynmap</name>
+        <type>MISC</type>
+        <bukkit-forum>489</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name>Landmarks</name>
+        <type>MISC</type>
+        <bukkit-forum>11932</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name>DeathMessagePlugin</name>
+        <type>MISC</type>
+        <bukkit-forum>7543</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name>Minequery</name>
+        <type>DEV</type>
+        <bukkit-forum>1358</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name>LoginMessage</name>
+        <type>INFO</type>
+        <bukkit-forum>252</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name></name>
+        <type></type>
+        <bukkit-forum></bukkit-forum>
+    </plugin>
+</plugins>
