@@ -54,6 +54,18 @@ xmlSaveEnabled: true
 xmlFileName: plugins.xml
 #Specific output folder for XML export, leave empty for default folder:
 xmlOutputFolder: ''
+#Enables FTP upload:
+ftpEnabled: false
+#If true, files are alway uploaded after exporting:
+ftpAutoUpload false:
+#Path to file on server (for example: "dir/dir/export"):
+ftpPath: ''
+#FTP Username:
+ftpUsername: user
+#FTP Password:
+ftpPasswd: password
+#FTP server address (without ftp://):
+ftpServer: address.com
 
 config_txt.yml
 ------------------------------------
@@ -73,18 +85,6 @@ printMinecraftServerInfo: true
 printBukkitInfo: true
 #Print plugins info (name & version):
 printPluginInfo: true
-#Enables FTP upload:
-ftpEnabled: false
-#If true, files are alway uploaded after exporting:
-ftpAutoUpload false:
-#Path to file on server (for example: "dir/dir/export"):
-ftpPath: ''
-#FTP Username:
-ftpUsername: user
-#FTP Password:
-ftpPasswd: password
-#FTP server address (without ftp://):
-ftpServer: adress.com
 
 config_xml.yml
 ------------------------------------
