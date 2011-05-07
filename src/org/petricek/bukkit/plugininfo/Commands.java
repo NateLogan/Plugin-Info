@@ -1,6 +1,5 @@
 package org.petricek.bukkit.plugininfo;
 
-import org.petricek.bukkit.plugininfo.model.ServerData;
 import org.petricek.bukkit.plugininfo.model.PluginData;
 import com.jascotty2.JMinecraftFontWidthCalculator;
 import java.util.ArrayList;

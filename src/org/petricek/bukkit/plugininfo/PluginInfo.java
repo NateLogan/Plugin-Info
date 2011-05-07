@@ -1,9 +1,5 @@
 package org.petricek.bukkit.plugininfo;
 
-import org.petricek.bukkit.plugininfo.model.ServerData;
-import org.petricek.bukkit.plugininfo.model.PluginData;
-import java.util.ArrayList;
-import java.util.Collections;
 import me.taylorkelly.help.Help;
 import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
