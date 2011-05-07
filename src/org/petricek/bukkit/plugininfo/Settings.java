@@ -21,7 +21,9 @@ public class Settings {
     public String ftpUsername;
     public String ftpPasswd;
     public String ftpServer;
-    
+
+    public boolean enableApiCraft;
+
     public String xmlFileName;
     public String xmlOutputFolder;
     public boolean xmlSaveEnabled;
@@ -58,9 +60,11 @@ public class Settings {
         ftpServer = config.getString("ftpServer", "server-address.com");
         ftpPath = config.getString("ftpPath", "");
 
+        enableApiCraft = config.getBoolean("enableApiCraft", false);
+
         xmlFileName = config.getString("xmlFileName", "plugins.xml");
         xmlOutputFolder = config.getString("xmlOutputFolder", "");
-        xmlSaveEnabled = config.getBoolean("xmlSaveEnabled", false);
+        xmlSaveEnabled = config.getBoolean("xmlSaveEnabled", true);
 
         /*
         htmlFileName = config.getString("htmlFileName", "plugins.html");

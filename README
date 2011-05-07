@@ -12,6 +12,7 @@ further processing.
 - Export basic info about plugins to XML/TXT
 - Supports Help plugin
 - FTP export
+- ApiCraft support
 
 [Commands:]
 Params inside "[ ]" are optional. "|" divides aliases. Using "plugininfo" instead of "plugi" is also possible.
@@ -66,6 +67,8 @@ ftpUsername: user
 ftpPasswd: password
 #FTP server address (without ftp://):
 ftpServer: address.com
+#Enables ApiCraft support (requires ApiCraft plugin), note: xml DTD is a bit different:
+enableApiCraft: false
 
 config_txt.yml
 ------------------------------------
@@ -124,6 +127,9 @@ printStats: true
 xslt: xsl-stylesheet_file.xsl
 
 [Changelog:]
+v0.1.3 - 7.5.2011
+- Added ApiCraft support
+- Cleaned up the code (a bit more according to MVC)
 v0.1.2 - 4.5.2011
 - Added FTP uploader
 v0.1.1 - 30.4.2011

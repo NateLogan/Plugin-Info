@@ -1,12 +1,13 @@
 package org.petricek.bukkit.plugininfo.model;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 
 /**
  *
  * @author Michal Petříček
  */
-public class PluginData implements Comparable<PluginData> {
+public class PluginData implements Comparable<PluginData>, Serializable {
 
     public PluginData() {
     }

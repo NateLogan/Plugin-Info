@@ -7,8 +7,10 @@ import java.util.ArrayList;
 import org.bukkit.Server;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
+import org.petricek.bukkit.plugininfo.controller.ApiCraftController;
 import org.petricek.bukkit.plugininfo.controller.ExportController;
 import org.petricek.bukkit.plugininfo.controller.MessageController;
+import org.petricek.bukkit.plugininfo.controller.PluginController;
 import org.petricek.bukkit.plugininfo.integration.FileManager;
 import org.petricek.bukkit.plugininfo.model.ExportType;
 
@@ -20,10 +22,14 @@ public class Commands {
 
     private final Permissions permissions;
     private final ExportController exportController;
+    private final ApiCraftController apiCraftController;
+    private final PluginController pluginController;
 
-    public Commands(Server server, ExportController exportController) {
+    public Commands(Server server, ExportController exportController, PluginController pluginController, ApiCraftController apiCraftController) {
         this.permissions = new Permissions(server);
         this.exportController = exportController;
+        this.pluginController = pluginController;
+        this.apiCraftController = apiCraftController;
     }
 
     public void help(CommandSender sender) {
@@ -66,7 +72,7 @@ public class Commands {
         }
     }
 
-    public void getAllPlugins(CommandSender sender, ArrayList<PluginData> plugins) {
+    public void getAllPlugins(CommandSender sender) {
         Player player = null;
         if (sender instanceof Player) {
             player = (Player) sender;
@@ -74,7 +80,7 @@ public class Commands {
 
         if (permissions.checkPermission(player, Permissions.PERMISSION_VIEW)) {
             StringBuilder out = new StringBuilder();
-            for (PluginData pluginInfo : plugins) {
+            for (PluginData pluginInfo : pluginController.getPluginVersionsList()) {
                 String t = PluginInfo.nameColor.toString() + pluginInfo.getName() + " "
                         + PluginInfo.versionColor.toString() + pluginInfo.getVersion() + PluginInfo.textColor.toString() + "; ";
                 out.append(t);
@@ -86,7 +92,7 @@ public class Commands {
 
     }
 
-    public void getPlugins(CommandSender sender, ArrayList<PluginData> plugins, int page) {
+    public void getPlugins(CommandSender sender, int page) {
         Player player = null;
         boolean console = true;
         if (sender instanceof Player) {
@@ -95,6 +101,8 @@ public class Commands {
         }
 
         if (permissions.checkPermission(player, Permissions.PERMISSION_VIEW)) {
+            ArrayList<PluginData> plugins = pluginController.getPluginVersionsList();
+            
             int entriesPerPage = PluginInfo.settings.entriesPerPage;
             if (page < 1 || page > plugins.size() / entriesPerPage + 1) {
                 MessageController.sendMessage(sender, PluginInfo.errorColor.toString() + "Page " + page + " does not exist");
@@ -113,7 +121,7 @@ public class Commands {
         }
     }
 
-    public void export(CommandSender sender, ArrayList<PluginData> plugins, ServerData serverData, String param) {
+    public void export(CommandSender sender, String param) {
         Player player = null;
         if (sender instanceof Player) {
             player = (Player) sender;
@@ -121,24 +129,24 @@ public class Commands {
 
         if (permissions.checkPermission(player, Permissions.PERMISSION_EXPORT) || permissions.checkPermission(player, Permissions.PERMISSION_EXPORT_ALL)) {
             if (param == null || param.isEmpty()) {
-                exportController.export(sender, ExportType.DEFAULT);
+                exportController.export(sender, ExportType.DEFAULT, pluginController.getPluginVersionsList(), pluginController.getServerInfo());
             } else if (param.equalsIgnoreCase("list") || param.equalsIgnoreCase("l")) {
                 MessageController.sendMessage(sender, PluginInfo.headertColor.toString() + "Available exports: " + PluginInfo.nameColor.toString() + "xml txt" /*+ " html"*/);
             } else if (param.equalsIgnoreCase("all") || param.equalsIgnoreCase("force")) {
                 if (permissions.checkPermission(player, Permissions.PERMISSION_EXPORT_ALL)) {
-                    exportController.export(sender, ExportType.ALL);
+                    exportController.export(sender, ExportType.ALL, pluginController.getPluginVersionsList(), pluginController.getServerInfo());
                 } else {
                     MessageController.sendMessage(sender, PluginInfo.errorColor.toString() + "You are not allowed to use command " + PluginInfo.commandColor.toString() + "/plugi export " + param);
                 }
             } else if (param.equalsIgnoreCase("xml")) {
                 if (PluginInfo.settings.xmlSaveEnabled || permissions.checkPermission(player, Permissions.PERMISSION_EXPORT_ALL)) {
-                    exportController.export(sender, ExportType.XML);
+                    exportController.export(sender, ExportType.XML, pluginController.getPluginVersionsList(), pluginController.getServerInfo());
                 } else {
                     MessageController.sendMessage(sender, PluginInfo.errorColor.toString() + "You are not allowed to use command " + PluginInfo.commandColor.toString() + "/plugi export " + param);
                 }
             } else if (param.equalsIgnoreCase("txt")) {
                 if (PluginInfo.settings.txtSaveEnabled || permissions.checkPermission(player, Permissions.PERMISSION_EXPORT_ALL)) {
-                    exportController.export(sender, ExportType.TXT);
+                    exportController.export(sender, ExportType.TXT, pluginController.getPluginVersionsList(), pluginController.getServerInfo());
                 } else {
                     MessageController.sendMessage(sender, PluginInfo.errorColor.toString() + "You are not allowed to use command " + PluginInfo.commandColor.toString() + "/plugi export " + param);
                 }
@@ -165,6 +173,7 @@ public class Commands {
         if (permissions.checkPermission(player, Permissions.PERMISSION_EXPORT)) {
             PluginInfo.settings.initialize();
             PluginInfo.settingsXml.initialize();
+            settingsReloaded();
             MessageController.sendMessage(sender, PluginInfo.headertColor.toString() + "Settings reloaded");
         } else {
             MessageController.sendMessage(sender,
@@ -251,6 +260,10 @@ public class Commands {
             }
         }
         return maxWidth;
+    }
+
+    private void settingsReloaded() {
+        apiCraftController.setEnabled(PluginInfo.settings.enableApiCraft);
     }
 
 }

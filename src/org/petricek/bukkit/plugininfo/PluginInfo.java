@@ -10,7 +10,9 @@ import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.petricek.bukkit.plugininfo.controller.ApiCraftController;
 import org.petricek.bukkit.plugininfo.controller.ExportController;
+import org.petricek.bukkit.plugininfo.controller.PluginController;
 import org.petricek.bukkit.plugininfo.model.ExportType;
 
 /**
@@ -22,7 +24,9 @@ public class PluginInfo extends JavaPlugin {
     private String name;
     private String version;
 
+    public static ApiCraftController apiCraftController;
     public static ExportController exportController;
+    public static PluginController pluginController;
     public static Commands commands;
     public static Settings settings;
     public static SettingsXml settingsXml;
@@ -47,15 +51,17 @@ public class PluginInfo extends JavaPlugin {
         settingsXml = new SettingsXml(this.getDataFolder());
         settingsTxt = new SettingsTxt(this.getDataFolder());
 
+        pluginController = new PluginController(this.getServer());
         exportController = new ExportController(this.getServer());
-        commands = new Commands(this.getServer(), exportController);
+        apiCraftController = new ApiCraftController(this.getServer(), this);
         
+        commands = new Commands(this.getServer(), exportController, pluginController, apiCraftController);
 
         registerHelp();
 
         BukkitLogger.info(name + " " + version + " enabled");
         
-        exportController.export(ExportType.DEFAULT);
+        exportController.export(ExportType.DEFAULT, pluginController.getPluginVersionsList(), pluginController.getServerInfo());
     }
 
     @Override
@@ -65,11 +71,11 @@ public class PluginInfo extends JavaPlugin {
         if (commandName.equals("plugi") || commandName.equals("plugininfo")) {
             if (args.length == 1) {
                 if (args[0].equalsIgnoreCase("list") || args[0].equalsIgnoreCase("l")) {
-                    commands.getPlugins(sender, getPluginVersionsList(), 1);
+                    commands.getPlugins(sender, 1);
                 } else if (args[0].equalsIgnoreCase("reload") || args[0].equalsIgnoreCase("r")) {
                     commands.reload(sender);
                 } else if (args[0].equalsIgnoreCase("export") || args[0].equalsIgnoreCase("e")) {
-                    commands.export(sender, getPluginVersionsList(), getServerInfo(), null);
+                    commands.export(sender, null);
                 } else if (args[0].equalsIgnoreCase("upload") || args[0].equalsIgnoreCase("u")) {
                     commands.upload(sender, ExportType.DEFAULT);
                 } else if (args[0].equalsIgnoreCase("help") || args[0].equalsIgnoreCase("h") || args[0].equalsIgnoreCase("?")) {
@@ -79,11 +85,11 @@ public class PluginInfo extends JavaPlugin {
                 }
             } else if (args.length == 2) {
                 if ((args[0].equalsIgnoreCase("list") || args[0].equalsIgnoreCase("l")) && isInteger(args[1])) {
-                    commands.getPlugins(sender, getPluginVersionsList(), Integer.parseInt(args[1]));
+                    commands.getPlugins(sender, Integer.parseInt(args[1]));
                 } else if ((args[0].equalsIgnoreCase("list") || args[0].equalsIgnoreCase("l")) && args[1].equalsIgnoreCase("all")) {
-                    commands.getAllPlugins(sender, getPluginVersionsList());
+                    commands.getAllPlugins(sender);
                 } else if (args[0].equalsIgnoreCase("export") || args[0].equalsIgnoreCase("e")) {
-                    commands.export(sender, getPluginVersionsList(), getServerInfo(), args[1]);
+                    commands.export(sender, args[1]);
                 } else if ((args[0].equalsIgnoreCase("upload") || args[0].equalsIgnoreCase("u"))) {
                     commands.upload(sender, args[1]);
                 } else {
@@ -97,38 +103,6 @@ public class PluginInfo extends JavaPlugin {
         }
 
         return false;
-    }
-
-    private ArrayList<PluginData> getPluginVersionsList() {
-        Plugin[] plugins = this.getServer().getPluginManager().getPlugins();
-        ArrayList<PluginData> list = new ArrayList<PluginData>(plugins.length);
-
-        for (Plugin plugin : plugins) {
-            PluginData pluginInfo = new PluginData();
-            pluginInfo.setName(plugin.getDescription().getName());
-            pluginInfo.setDescription(plugin.getDescription().getDescription());
-            pluginInfo.setVersion(plugin.getDescription().getVersion());
-            pluginInfo.setWebsite(plugin.getDescription().getWebsite());
-            pluginInfo.setAuthors(plugin.getDescription().getAuthors());
-            pluginInfo.setFullName(plugin.getDescription().getFullName());
-            pluginInfo.setDepend(plugin.getDescription().getDepend());
-            pluginInfo.setCommands(plugin.getDescription().getCommands());
-            pluginInfo.setDatabaseEnabled(plugin.getDescription().isDatabaseEnabled());
-            pluginInfo.setEnabled(plugin.isEnabled());
-            list.add(pluginInfo);
-        }
-
-        Collections.sort(list);
-
-        return list;
-    }
-
-    private ServerData getServerInfo() {
-        ServerData serverInfo = new ServerData();
-        serverInfo.setVersions(this.getServer().getVersion());
-        serverInfo.setServerName(this.getServer().getServerName());
-        serverInfo.setServerPort("" + this.getServer().getPort());
-        return serverInfo;
     }
 
     public void registerHelp() {
