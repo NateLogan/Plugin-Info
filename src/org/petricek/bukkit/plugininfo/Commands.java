@@ -14,7 +14,7 @@ import org.petricek.bukkit.plugininfo.integration.FileManager;
 import org.petricek.bukkit.plugininfo.model.ExportType;
 
 /**
- *
+ * Class for handling commands executions.
  * @author Michal Petříček
  */
 public class Commands {

@@ -1,11 +1,46 @@
 name: PluginInfo
-description: View and export (xml, txt) basic info about installed plugins
-version: 0.1.3
+description: View and export (xml, txt) basic info about installed plugins.
+version: 0.1.4
 author: NateLogan
 web: http://forums.bukkit.org/threads/15105/
 main: org.petricek.bukkit.plugininfo.PluginInfo
 commands:
-  plugininfo:
-    description: List of plugins and their versions
-    usage: /<command> - Displays help with further instructions
-    aliases: [plugi]
+    plugininfo:
+        description: List of plugins and their versions
+        usage: /<command> - Displays help with further instructions
+        aliases: [plugi]
+        usage: |
+            /<command> reload - reload the configuration from disk.
+            /<command> [help|h|?] - Displays help
+            /<command> list|l [#] - Displays formatted list of plugins and their versions, page number [#]
+            /<command> list|l all - Displays versions of all plugins
+            /<command> export|e - Exports info about plugins to file types defined in config.yml
+            /<command> export|e list|l - List of available export types: XML, TXT
+            /<command> export|e [param] - Exports info about plugins to [param]-type file
+            /<command> export|e all - Exports info about plugins to all available file types
+            /<command> upload|u - Uploads all available exported files defined in settings.yml to ftp (if enabled)
+            /<command> upload|u all - Uploads all available exported files to ftp (if enabled)
+            /<command> upload|u [param] - Uploads specified exported file to ftp (if enabled)
+            /<command> upload|u list - List of available files to upload
+            /<command> reload|r - Reloads settings
+permissions:
+    plugininfo.*:
+        default: op
+        description: Allows use of all PluginInfo commands.
+        children:
+            plugininfo.reload: true
+            plugininfo.view: true
+            plugininfo.export: true
+            plugininfo.export.all: true
+            plugininfo.upload: true
+    plugininfo.view:
+        default: true
+        description: Allows to view installed plugins and their versions.
+    plugininfo.export:
+        description: Allows to invoke manual export (only those exports enabled in config.yml).
+    plugininfo.export.all:
+        description: Allows to invoke manual export of any type.
+    plugininfo.reload:
+        description: Allows to reload PluginInfo settings.
+    plugininfo.upload:
+        description: Allows to upload exported files.

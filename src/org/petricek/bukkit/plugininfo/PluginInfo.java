@@ -10,6 +10,7 @@ import org.petricek.bukkit.plugininfo.controller.ApiCraftController;
 import org.petricek.bukkit.plugininfo.controller.ExportController;
 import org.petricek.bukkit.plugininfo.controller.PluginController;
 import org.petricek.bukkit.plugininfo.model.ExportType;
+import org.petricek.bukkit.plugininfo.utils.Utils;
 
 /**
  *
@@ -36,6 +37,7 @@ public class PluginInfo extends JavaPlugin {
     public static final ChatColor errorColor = ChatColor.RED;
 
     public void onDisable() {
+        apiCraftController.setEnabled(false);
         BukkitLogger.info(name + " " + version + " disabled");
     }
 
@@ -80,7 +82,7 @@ public class PluginInfo extends JavaPlugin {
                     commands.help(sender);
                 }
             } else if (args.length == 2) {
-                if ((args[0].equalsIgnoreCase("list") || args[0].equalsIgnoreCase("l")) && isInteger(args[1])) {
+                if ((args[0].equalsIgnoreCase("list") || args[0].equalsIgnoreCase("l")) && Utils.isInteger(args[1])) {
                     commands.getPlugins(sender, Integer.parseInt(args[1]));
                 } else if ((args[0].equalsIgnoreCase("list") || args[0].equalsIgnoreCase("l")) && args[1].equalsIgnoreCase("all")) {
                     commands.getAllPlugins(sender);
@@ -124,12 +126,4 @@ public class PluginInfo extends JavaPlugin {
         }
     }
 
-    public static boolean isInteger(String string) {
-        try {
-            Integer.parseInt(string);
-        } catch (Exception e) {
-            return false;
-        }
-        return true;
-    }
 }
