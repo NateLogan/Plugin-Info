@@ -224,6 +224,18 @@
         <bukkit-forum>252</bukkit-forum>
     </plugin>
     <plugin>
+        <name>PermissionsEx</name>
+        <type>ADMN</type>
+        <type>DEV</type>
+        <bukkit-forum>18140</bukkit-forum>
+    </plugin>
+    <plugin>
+        <name>PermissionsBukkit</name>
+        <type>ADMN</type>
+        <type>DEV</type>
+        <bukkit-forum>26785</bukkit-forum>
+    </plugin>
+    <plugin>
         <name></name>
         <type></type>
         <bukkit-forum></bukkit-forum>
