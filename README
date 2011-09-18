@@ -1,7 +1,7 @@
 PluginInfo
 ===========
 View and export (xml, txt) basic info about installed plugins
-Version: v0.1.3
+Version: v0.1.4
 
 This plugin allows to view versions of installed plugins ingame/via console
 (that's not interesting) and export them to XML and/or TXT file - good for
@@ -127,6 +127,10 @@ printStats: true
 xslt: xsl-stylesheet_file.xsl
 
 [Changelog:]
+v0.1.4 - 18.9.2011
+- Removed support for GroupManager
+- Added support for PermissionsBukkit and SuperPerms
+- Updated plugin.yml to support SuperPerms
 v0.1.3 - 7.5.2011
 - Added ApiCraft support
 - Cleaned up the code (a bit more according to MVC)
